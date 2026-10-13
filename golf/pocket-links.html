@@ -318,7 +318,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
     <div class="how">
       <b>Three shot games.</b> Point at the spot you want, then click (or press <b>Space</b>) once per part. Every part is scored out of 100.
       <ol>
-        <li><b>Full swing:</b> Address, Backswing, Tempo, Low point. A Bump and run uses this swing too, with wider windows.</li>
+        <li><b>Full swing:</b> Backswing, Tempo, Face, Low point. Squaring the face is hard, and the low point runs from a chunk to a topped ball. A Bump and run uses this swing too, with wider windows.</li>
         <li><b>Chip:</b> Hands, Length, Contact. Pick Low, Mid or High spin. Harder than a full swing, just like the real thing.</li>
         <li><b>Putt:</b> Face, Length, Strike. Read the white streaks on the green, they drift downhill.</li>
       </ol>
@@ -797,7 +797,7 @@ function setupShot(){
 }
 
 /* ---------- the three shot games ---------- */
-const GAMES={full:['Address','Backswing','Tempo','Low point'],chip:['Hands','Length','Contact'],putt:['Face','Length','Strike']};
+const GAMES={full:['Backswing','Tempo','Face','Low point'],chip:['Hands','Length','Contact'],putt:['Face','Length','Strike']};
 const SHORT={Address:'ADDRESS',Backswing:'BACK',Tempo:'TEMPO','Low point':'LOW PT',Hands:'HANDS',Length:'LENGTH',Contact:'CONTACT',Face:'FACE',Strike:'STRIKE'};
 const game=()=>mode==='bump'?'full':mode;
 const spd=()=>tut.on?.45:1;
@@ -814,7 +814,7 @@ function spinWin(){return mode==='chip'?[1.15,1,.82][spinLv]:1;}
 // windows per phase, as error units of each gauge
 function wins(){
  const k=forgive(),g=game();
- if(g==='full')return{a:.08*k,b:.03*k,t:.1*k,l:.03*k};
+ if(g==='full')return{b:.03*k,t:.1*k,f:.075*k,l:.065*k};
  if(g==='chip')return{h:.08*k*spinWin(),b:.025*k,l:.018*k*spinWin()};
  return{f:.09,b:.03,s:.035};
 }
@@ -830,14 +830,21 @@ function swingAction(){
  const g=game(),w=wins();
  if(state==='aim'){
   sw.v={plannedP:plannedPower(),k:forgive()};sw.scores=[];
+  if(g==='full'){meter.pos=0;state='swing';ph=0;$('report').hidden=true;scoreReset(g);sfx.tick();updateHint();return;}
   const v=oscVal();
-  if(g==='full'){sw.v.a=v;sw.scores[0]=sc(v,w.a);}
-  else if(g==='chip'){sw.v.h=v-HANDS_T;sw.scores[0]=sc(v-HANDS_T,w.h);}
+  if(g==='chip'){sw.v.h=v-HANDS_T;sw.scores[0]=sc(v-HANDS_T,w.h);}
   else{sw.v.f=v;sw.scores[0]=sc(v,w.f);}
   meter.pos=0;state='swing';ph=0;$('report').hidden=true;
   scoreReset(g);scoreReveal(0);sfx.tick();startTrans();updateHint();return;
  }
  if(state!=='swing'||sw.trans)return;
+ if(g==='full'){
+  if(ph===0){sw.v.power=meter.pos;const d=meter.pos-sw.v.plannedP;sw.scores[0]=Math.max(1,sc(d,w.b)-Math.round(Math.max(0,meter.pos-1)*120));sw.v.tt=0;sfx.lock();}
+  else if(ph===1){sw.v.t=sw.v.tt/TEMPO_IDEAL;sw.scores[1]=sc(sw.v.t-1,w.t);sfx.tick();}
+  else if(ph===2){sw.v.f=sw.v.fp;sw.scores[2]=sc(sw.v.fp,w.f);sfx.tick();}
+  else{sw.v.final=meter.pos;finalScore();}
+  scoreReveal(ph);startTrans();updateHint();return;
+ }
  const last=ph===GAMES[g].length-1;
  if(ph===1){
   sw.v.power=meter.pos;const d=meter.pos-sw.v.plannedP;
@@ -853,7 +860,7 @@ function swingAction(){
 function finalScore(){
  const g=game(),w=wins(),p=sw.v.final;
  sw.v.duff=g!=='putt'&&p<=MLO+.001;
- if(g==='full'){let lo=p;if(sw.v.power>1&&!sw.v.duff)lo+=(Math.random()-.5)*(sw.v.power-1)*.5;sw.v.lo=lo;sw.scores[3]=sw.v.duff?1:sc(lo,w.l);}
+ if(g==='full'){sw.v.duff=p<=-.999;let lo=p;if(sw.v.power>1&&!sw.v.duff)lo+=(Math.random()-.5)*(sw.v.power-1)*3;sw.v.lo=clamp(lo,-1,1);sw.scores[3]=sw.v.duff?1:sc(sw.v.lo,w.l);}
  else if(g==='chip'){const lo=p+sw.v.h*.025;sw.v.lo=lo;sw.scores[2]=sw.v.duff?1:sc(lo,w.l);}
  else sw.scores[2]=sc(p,w.s);
 }
@@ -862,8 +869,9 @@ function endTrans(){
  const tr=sw.trans;sw.trans=null;
  if(tr.next==='hit'){startAnim();return;}
  ph=tr.next;
- if(ph===1)meter.pos=0;
- if(game()==='full'&&ph===3)meter.pos=sw.v.power;
+ const g=game();
+ if(g==='full'){if(ph===2)sw.v.fp=1;if(ph===3)meter.pos=1;}
+ else if(ph===1)meter.pos=0;
  updateHint();tutEvent('ph'+ph);
 }
 function cancelSwing(){if(state==='swing'&&!tut.on&&!(sw.trans&&sw.trans.next==='hit')){state='aim';ph=0;sw.trans=null;meter.pos=0;scoreDim();updateHint();}}
@@ -873,18 +881,25 @@ function updateSwing(dt){
  if(state==='aim'){sw.osc+=dt*TAU/oscPeriod()*s;return;}
  if(state!=='swing')return;
  if(sw.trans){sw.trans.t+=dt;if(sw.trans.t>=sw.trans.dur)endTrans();return;}
+ if(g==='full'){
+  const c=CLUBS[ci],e=(sw.v.t||1)-1;
+  if(ph===0){meter.pos+=dt*(mode==='bump'?.8:1)*s;if(meter.pos>=MHI){meter.pos=MHI;swingAction();}}
+  else if(ph===1){sw.v.tt+=dt*s;if(sw.v.tt>=TEMPO_IDEAL*2)swingAction();}
+  else if(ph===2){
+   // the face turns from open to closed through impact, a rushed transition turns it faster
+   sw.v.fp-=dt*2.3*(1+Math.max(0,-e)*1.3+Math.max(0,e)*.4)*(mode==='bump'?.75:1)*s;
+   if(sw.v.fp<=-1){sw.v.fp=-1;swingAction();}
+  }else{
+   const base=lie==='rough'?1.35:lie==='deep'?1.55:lie==='sand'?1.5:1.18;
+   meter.pos-=dt*1.6*base*(1.25-c.fg*.4)*(mode==='bump'?.8:1)*s;
+   if(meter.pos<=-1){meter.pos=-1;swingAction();}
+  }
+  return;
+ }
  if(ph===1){
   if(g==='chip')meter.pos+=dt*(.55+1.5*meter.pos)*s;
-  else if(g==='putt')meter.pos+=dt*.7*s;
-  else meter.pos+=dt*(mode==='bump'?.8:1)*s;
+  else meter.pos+=dt*.7*s;
   if(meter.pos>=MHI){meter.pos=MHI;swingAction();}
- }else if(g==='full'&&ph===2){
-  sw.v.tt+=dt*s;if(sw.v.tt>=TEMPO_IDEAL*2)swingAction();
- }else if(g==='full'&&ph===3){
-  const c=CLUBS[ci];
-  const base=lie==='rough'?1.35:lie==='deep'?1.55:lie==='sand'?1.5:1.18;
-  meter.pos-=dt*base*(1.25-c.fg*.4)*(mode==='bump'?.8:1)*s;
-  if(meter.pos<=MLO){meter.pos=MLO;swingAction();}
  }else if(g==='chip'&&ph===2){
   meter.pos-=dt*(.75+sw.v.power*.5)*s;
   if(meter.pos<=MLO){meter.pos=MLO;swingAction();}
@@ -944,30 +959,32 @@ function hit(){
   landEst={x:ball.x+Math.cos(aim)*carry,y:ball.y+Math.sin(aim)*carry};
   if(!quietHit){sfx.whoosh();setTimeout(()=>sfx.hit(.4,pure),50);}
  }else{
-  const a=sw.v.a,e=sw.v.t-1;
-  const duff=sw.v.duff;
-  let lo=sw.v.lo;
-  const pure=!duff&&Math.abs(lo)<w.l*.27;
-  const aEff=Math.abs(a)<w.a*.5?0:a,eEff=Math.abs(e)<w.t*.5?0:e;
+  const f=sw.v.f||0,e=sw.v.t-1,duff=sw.v.duff,lo=sw.v.lo,n=lo/w.l;
+  const fEff=Math.abs(f)<w.f*.5?0:f,eEff=Math.abs(e)<w.t*.5?0:e;
+  const pure=!duff&&Math.abs(n)<.3;
+  const topped=!duff&&lo>.55,chunk=duff||lo<-.55;
+  let carry=maxDist()*power*(1-Math.abs(eEff)*.07/k),apexMul=1,vL;
+  // low point: a little thin or fat costs a bit, way thin tops it along the ground, way fat chunks it
+  if(chunk){carry*=duff?.1:.16+Math.random()*.1;apexMul=.45;vL='Chunked';}
+  else if(topped){carry*=.2+Math.random()*.08;apexMul=.03;ball.rollBonus=2.4;vL='Topped';}
+  else if(pure){carry*=1.025;vL='Pure';}
+  else if(n<0){const m=-n;carry*=Math.max(.35,1-(m<1.5?.07*m:.1+.13*(m-1.5)));apexMul=1-Math.min(.35,m*.06);vL=m<1.5?'Fat':'Heavy';}
+  else{const m=n;carry*=Math.max(.5,1-(m<1.5?.04*m:.06+.07*(m-1.5)));apexMul=Math.max(.2,1-m*.18);ball.rollBonus=1+Math.min(1,m*.25);vL=m<1.5?'Thin':'Very thin';}
+  const deg=Math.abs(f*9/k).toFixed(1);
+  const vF=fEff===0?'Square':f>0?`Open ${deg}° · ${f>.35?'slice':'fade'}`:`Closed ${deg}° · ${f<-.35?'hook':'draw'}`;
   const vT=eEff===0?'Smooth':e<0?(e<-.3?'Rushed':'Quick'):(e>.3?'Lazy':'Slow');
-  const vL=duff?'Chunked':pure?'Pure':lo<0?(lo<-.05?'Heavy':'Fat'):(lo>.05?'Bladed':'Thin');
-  verdicts=[aEff===0?'Square':`${a>0?'Open':'Closed'} ${Math.abs(a*.045/k*180/Math.PI).toFixed(1)}°`,vB,vT+(eEff?(e<0?' · hook':' · slice'):''),vL];
-  let carry=maxDist()*power*(1-Math.abs(eEff)*.06/k);
-  let apexMul=1;
-  if(duff)carry*=.42;
-  else if(pure)carry*=1.025;
-  else if(lo<0){carry*=1-Math.min(.6,-lo*6/k);apexMul=1-Math.min(.3,-lo*4);}
-  else{carry*=1-Math.min(.35,lo*3/k);apexMul=1-Math.min(.65,lo*9);ball.rollBonus=1+Math.min(.8,lo*8);}
-  const ang=aim+aEff*.045/k;
+  verdicts=[vB,vT,vF,vL];
+  // face: open starts it right and curves it right, closed the other way
+  const ang=aim+fEff*.16/k;
   if(mode==='bump'){
    const T=.6+carry/50,apex=Math.max(.4,carry*.1*apexMul);
    ball.g=8*apex/(T*T);ball.vz=4*apex/T;ball.vx=Math.cos(ang)*carry/T;ball.vy=Math.sin(ang)*carry/T;
-   ball.chipRoll=carry*(c.bump||2.5)*(pure?1:lo<0?1-Math.min(.6,-lo*5):1+Math.min(.8,lo*6));
+   ball.chipRoll=carry*(c.bump||2.5)*(pure?1:lo<0?1-Math.min(.6,-n*.15):1+Math.min(.8,n*.2));
   }else{
-   const T=1.15+carry/110,apex=Math.max(1.2,carry*c.l*(lie==='sand'?1.1:1)*apexMul);
+   const T=1.15+carry/110,apex=Math.max(topped?.3:1.2,carry*c.l*(lie==='sand'?1.1:1)*apexMul);
    ball.g=8*apex/(T*T);ball.vz=4*apex/T;
    ball.vx=Math.cos(ang)*carry/T;ball.vy=Math.sin(ang)*carry/T;
-   const ca=eEff*14*c.cv/k;
+   const ca=fEff*16*c.cv/k;
    ball.ax=-Math.sin(aim)*ca;ball.ay=Math.cos(aim)*ca;
   }
   ball.mode='fly';ball.z=.01;
@@ -1193,22 +1210,33 @@ function drawMeter(){
  const ov=live?oscVal():(sw.last&&sw.last.game===g?sw.last.o:0);
  if(g==='full'){
   if(ph0){
-   dark();const R=half-11;zoneC(mid,wv.a*R);
-   mx.fillStyle='rgba(243,246,238,.55)';mx.fillRect(mid-.5,ty-3,1,th+6);
-   for(let k=1;k<4;k++){const o=half*k/4;mx.fillRect(mid-o-.5,ty+4,1,th-8);mx.fillRect(mid+o-.5,ty+4,1,th-8);}
-   mx.beginPath();mx.arc(mid+ov*R,ty+th/2,7,0,TAU);mx.fillStyle='rgba(243,246,238,.95)';mx.fill();mx.strokeStyle='rgba(0,0,0,.4)';mx.stroke();
-   small('CLOSED',tx);small('SQUARE',mid,'center');small('OPEN',tx+tw,'right');
+   grad();const pp=state==='aim'||!sw.v.plannedP?plannedPower():sw.v.plannedP,px=X(pp);planLine(px);small('PLAN',px,'center');if(Math.abs(X(1)-px)>34)small('FULL',X(1),'center');
+   needle(X(state==='swing'?meter.pos:0));
   }else if(si===1){
-   grad();const px=X(sw.v.plannedP);planLine(px);small('PLAN',px,'center');if(Math.abs(X(1)-px)>34)small('FULL',X(1),'center');needle(X(meter.pos));
-  }else if(si===2){
    dark();const T=x=>tx+clamp(x,0,2)/2*tw;
    mx.fillStyle='rgba(246,197,27,.9)';mx.fillRect(T(1-wv.t),ty-3,T(1+wv.t)-T(1-wv.t),th+6);
    const f=sw.v.tt/TEMPO_IDEAL;mx.fillStyle='rgba(243,246,238,.85)';mx.fillRect(tx,ty+4,T(f)-tx,th-8);needle(T(f));
    small('RUSHED',tx);small('SMOOTH',T(1),'center');small('LAZY',tx+tw,'right');
+  }else if(si===2){
+   // club face gauge: the face swings from open to closed, the yellow sliver is square
+   dark();const F=v=>mid+v*(half-12);
+   mx.fillStyle='rgba(246,197,27,.9)';mx.fillRect(F(-wv.f),ty-3,F(wv.f)-F(-wv.f),th+6);
+   mx.fillStyle='rgba(243,246,238,.5)';mx.fillRect(mid-.5,ty-4,1,th+8);
+   for(let k=1;k<5;k++){const o=(half-12)*k/5;mx.fillRect(mid-o-.5,ty+5,1,th-10);mx.fillRect(mid+o-.5,ty+5,1,th-10);}
+   const fp=sw.v.fp===undefined?1:sw.v.fp;
+   mx.save();mx.translate(F(fp),ty+th/2);mx.rotate(fp*.55);mx.fillStyle=Math.abs(fp)<wv.f?'#f6c51b':'#f3f6ee';mx.strokeStyle='rgba(0,0,0,.5)';mx.lineWidth=1;mx.fillRect(-2,-th/2-5,4,th+10);mx.strokeRect(-2,-th/2-5,4,th+10);mx.restore();
+   small('CLOSED · HOOK',tx);small('SQUARE',mid,'center');small('OPEN · SLICE',tx+tw,'right');
   }else{
-   grad();mx.fillStyle='#f6c51b';mx.fillRect(X(-wv.l),ty-3,X(wv.l)-X(-wv.l),th+6);
-   mx.fillStyle='#f3f6ee';mx.fillRect(X(0)-1,ty-5,2,th+10);mx.fillStyle='#ff5b4f';mx.fillRect(X(sw.v.power)-2,ty-6,4,th+12);
-   small('FAT',tx,'left');small('THIN',X(wv.l)+6,'left');needle(X(meter.pos));
+   // low point bar: fat on the left, thin on the right, chunk and top at the far ends
+   const Lx=v=>mid+v*(half-4);
+   const gr=mx.createLinearGradient(tx,0,tx+tw,0);
+   gr.addColorStop(0,'#5a3b22');gr.addColorStop(.2,'#7a5232');gr.addColorStop(.38,'#3f7d4f');gr.addColorStop(.5,'#4f9a52');gr.addColorStop(.62,'#3f7d4f');gr.addColorStop(.8,'#b8b07a');gr.addColorStop(1,'#e2dcb0');
+   rr(tx,ty,tw,th,2);mx.fillStyle=gr;mx.fill();
+   mx.fillStyle='#f6c51b';mx.fillRect(Lx(-wv.l),ty-3,Lx(wv.l)-Lx(-wv.l),th+6);
+   mx.fillStyle='#f3f6ee';mx.fillRect(mid-1,ty-5,2,th+10);
+   mx.fillStyle='#ff5b4f';mx.fillRect(Lx(-.55)-1,ty-2,2,th+4);mx.fillRect(Lx(.55)-1,ty-2,2,th+4);
+   small('CHUNK',tx);small('FAT',Lx(-.3),'center');small('THIN',Lx(.3),'center');small('TOP',tx+tw,'right');
+   needle(Lx(state==='swing'&&ph===3?meter.pos:1));
   }
  }else if(g==='chip'){
   if(ph0){
@@ -1445,9 +1473,9 @@ function buildSeq(){
  // where the ball met the face: v is up and down on the face, h is heel to toe
  let vN=0,hN=0;
  if(g==='putt')hN=clamp((sw.v.final||0)/(w.s*2),-1,1);
- else{vN=clamp(lo/(w.l*2),-1,1);hN=g==='full'?clamp(e*2.2,-1,1):clamp((sw.v.h||0)/(w.h*2.5),-1,1);}
+ else{vN=clamp(lo/(w.l*(g==='full'?3:2)),-1,1);hN=g==='full'?clamp(e*2.2,-1,1):clamp((sw.v.h||0)/(w.h*2.5),-1,1);}
  const last=sw.scores[sw.scores.length-1]||1;
- return{g,top,keys,total:a,impAt:keys[4][1],e,lo,fat,thin,vN,hN,overall,last,lean:g==='full'?(sw.v.a||0):0,hands:g==='chip'?(sw.v.h||0):0,club:c,impDur:1.1,pw};
+ return{g,top,keys,total:a,impAt:keys[4][1],e,lo,fat,thin,vN,hN,overall,last,lean:0,topped:g==='full'&&lo>.55,chunk:g==='full'&&(sw.v.duff||lo<-.55),hands:g==='chip'?(sw.v.h||0):0,club:c,impDur:1.1,pw};
 }
 function startAnim(){
  const S=buildSeq();
@@ -1538,7 +1566,7 @@ function drawPix(){
  if(onTee){c.fillStyle='#f4f4f4';c.fillRect(bx,R.FY-1,1,2);by-=2;}
  if(imp){const tt=t-S.impAt;
   if(S.g==='putt'){bx+=40*tt-8*tt*tt;}
-  else{const vx=S.fat?45:S.thin?170:S.g==='chip'?70:150,vy=S.fat?30:S.thin?14:S.g==='chip'?55:62;bx+=vx*tt;by-=Math.max(0,vy*tt-30*tt*tt);}
+  else{const vx=S.chunk?16:S.topped?75:S.fat?45:S.thin?170:S.g==='chip'?70:150,vy=S.chunk?10:S.topped?0:S.fat?30:S.thin?14:S.g==='chip'?55:62;bx+=vx*tt;by-=Math.max(0,vy*tt-30*tt*tt);}
  }
  // golfer: outline pass then color pass, back to front
  const parts=[
@@ -1613,7 +1641,7 @@ function drawImp(){
  if(ti>=.6&&!PX.impLab){PX.impLab=1;
   let lab;
   if(sweet)lab=S.g==='putt'?'Center of the face':'Sweet spot';
-  else{const v=S.g==='putt'?'':S.vN>.25?(S.thin?'Thin · low on the face':'Low on the face'):S.vN<-.25?(S.fat?'Fat · turf first':'High on the face'):'';const h=S.hN>.25?'Toe':S.hN<-.25?'Heel':'';lab=[h,v].filter(Boolean).join(' · ');}
+  else{const v=S.g==='putt'?'':S.topped?'Topped':S.chunk?'Chunked':S.vN>.25?(S.thin?'Thin · low on the face':'Low on the face'):S.vN<-.25?(S.fat?'Fat · turf first':'High on the face'):'';const h=S.hN>.25?'Toe':S.hN<-.25?'Heel':'';lab=[h,v].filter(Boolean).join(' · ');}
   const el=$('impLab');el.textContent=lab;el.className=sweet?'sweet':S.last>=70?'ok':'bad';
  }
 }
@@ -1712,19 +1740,20 @@ function updateHUD(){
  updateHint();
 }
 const HINTS={
- full:[['Point at your target · click when the bubble is centered','Drag to pick your target · tap when the bubble is centered'],['Stop the needle on the dashed line','Tap on the dashed line'],['Pause at the top · click when the bar reaches the yellow window','Tap when the bar reaches yellow'],['Click as the needle crosses the yellow zone','Tap as the needle hits yellow']],
+ full:[['Stop the needle on the dashed line','Tap on the dashed line'],['Pause at the top · click when the bar reaches the yellow window','Tap when the bar reaches yellow'],['Click when the face is square','Tap when the face is square'],['Click in the yellow zone · right is thin, left is fat','Tap in the yellow zone']],
  chip:[['Pick your landing spot · click when the shaft leans into the yellow','Drag to your landing spot · tap when the shaft is in the yellow'],['Stop on the dashed line · the needle speeds up','Tap on the dashed line, it speeds up'],['Click in the tiny yellow zone for a crisp strike','Tap in the tiny yellow zone']],
  putt:[['Point where the ball should start · click when the face is square','Drag to aim · tap when the face is square'],['Stop the putter on the dashed line','Tap on the dashed line'],['Click as the putter reaches the ball','Tap as the putter reaches the ball']]
 };
-const BTN={full:['Address','Top','Go','Strike'],chip:['Hands','Length','Strike'],putt:['Face','Length','Stroke']};
+const BTN={full:['Top','Go','Square','Strike'],chip:['Hands','Length','Strike'],putt:['Face','Length','Stroke']};
 function updateHint(){
  const T=isTouch?1:0;const h=$('hint');const g=game();
  const si=state==='aim'?0:state==='swing'?ph:-1;
- if(si>=0)h.textContent=HINTS[g][si][T];
+ if(g==='full'&&state==='aim')h.textContent=T?'Drag to pick your target · tap Swing to start':'Point at your target · click or press Space to start the swing';
+ else if(si>=0)h.textContent=HINTS[g][si][T];
  else if(state==='anim')h.textContent=T?'Tap to skip':'Click to skip';
  else if(state==='holed')h.textContent=T?'Tap for the scorecard':'Click for the scorecard';
  else h.innerHTML='&nbsp;';
- $('swing').textContent=si>=0?BTN[g][si]:BTN[g][0];
+ $('swing').textContent=g==='full'&&state==='aim'?'Swing':si>=0?BTN[g][si]:BTN[g][0];
 }
 let toastT=null;
 function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),1900);}
@@ -1904,11 +1933,11 @@ function trainResult(kind){
 /* ---------- tutorial ---------- */
 const TUTS={
  full:[
-  {on:'now',t:'Full swing',b:'Four clicks make one swing, and each part is scored out of 100. Everything runs at half speed during this tutorial.'},
-  {on:'ph0',t:'1 · Address',b:'Move your pointer to put the yellow ring where you want to land. Then watch the bubble on the level and click when it sits in the yellow. Off center opens or closes your aim.'},
-  {on:'ph1',t:'2 · Backswing',b:'The needle runs right. Stop it on the dashed PLAN line to fly your planned distance. Past the white FULL line is overswing: extra yards, less control.'},
-  {on:'ph2',t:'3 · Tempo',b:'Pause at the top. The bar fills up, click when it reaches the yellow window. Too early is rushed and hooks left, too late is lazy and slices right.'},
-  {on:'ph3',t:'4 · Low point',b:'The needle swings back down. Click as it crosses the yellow zone. Early catches it thin, late hits it fat, dead center is Pure.'},
+  {on:'now',t:'Full swing',b:'Four parts make one swing: Backswing, Tempo, Face and Low point. Each is scored from 1 to 100. Everything runs at half speed during this tutorial.'},
+  {on:'ph0',t:'1 · Backswing',b:'Put the yellow ring where you want to land, then click to start the swing. Stop the needle on the dashed PLAN line to fly your planned distance. Past the white FULL line is overswing.'},
+  {on:'ph1',t:'2 · Tempo',b:'Pause at the top and click when the bar reaches the yellow window. Rushed or lazy costs distance, and a rushed transition makes the face turn faster in the next step.'},
+  {on:'ph2',t:'3 · Face',b:'The club face turns from open to closed as you swing down. Click when it is square. Early leaves it open: the ball starts right and slices. Late shuts it: it starts left and hooks. Dead straight is hard.'},
+  {on:'ph3',t:'4 · Low point',b:'Where the club bottoms out. Click in the yellow zone. A bit to the right is thin, all the way right tops it along the ground. A bit to the left is fat, all the way left is a chunk that barely goes anywhere.'},
   {on:'result',t:'Your swing report',b:'Every shot shows a score per part. Forgiving clubs like hybrids and the 5 wood give wider windows, set them up in myNolan. From now on the ball comes back to this spot after every shot.',last:true}
  ],
  chip:[
@@ -2016,7 +2045,7 @@ function loop(now){
  update(dt);render();
  requestAnimationFrame(loop);
 }
-window.__golf={get state(){return state},get ph(){return ph},get mode(){return mode},get ball(){return ball},get hole(){return hole},get aim(){return aim},get tut(){return tut},get last(){return sw.last},get clubs(){return CLUBS.map(c=>c.id)},swingAction,startDaily,startTraining,setMode,setSpin,_dbg:()=>({osc:oscVal(),pos:meter.pos,tt:sw.v&&sw.v.tt,pp:sw.v&&sw.v.plannedP,w:wins(),g:game(),stop:(mode==='chip'||mode==='bump')?predictStop(landingPoint()):null,land:landingPoint(),pin:hole.pin}),surfaceAt:(x,y)=>surfaceAt(x,y)};
+window.__golf={get state(){return state},get ph(){return ph},get mode(){return mode},get ball(){return ball},get hole(){return hole},get aim(){return aim},get tut(){return tut},get last(){return sw.last},get clubs(){return CLUBS.map(c=>c.id)},swingAction,startDaily,startTraining,setMode,setSpin,_dbg:()=>({osc:oscVal(),pos:meter.pos,fp:sw.v&&sw.v.fp,tt:sw.v&&sw.v.tt,pp:sw.v&&sw.v.plannedP,w:wins(),g:game(),stop:(mode==='chip'||mode==='bump')?predictStop(landingPoint()):null,land:landingPoint(),pin:hole.pin}),surfaceAt:(x,y)=>surfaceAt(x,y)};
 resize();
 showMenu();
 requestAnimationFrame(loop);
