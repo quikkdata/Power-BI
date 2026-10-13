@@ -420,16 +420,16 @@ function prettyDay(k){const[y,m,d]=k.split('-').map(Number);return new Date(y,m-
 /* ---------- clubs: four slots (woods, irons, wedges, putter), cards inside each type ---------- */
 const RAR={common:{n:'Common',c:'#a9bdb0',w:70},rare:{n:'Rare',c:'#5cbcff',w:24},epic:{n:'Epic',c:'#b46cff',w:5.2},legend:{n:'Legendary',c:'#ffd34d',w:.8}};
 const RAR_ORDER=['common','rare','epic','legend'];
-const SLOTS=[['wood','Woods'],['irons','Irons'],['wedges','Wedges'],['putter','Putter']];
+const SLOTS=[['long','Long'],['irons','Irons'],['wedges','Wedges'],['putter','Putter']];
+const CATN={long:'Long',irons:'Irons',wedges:'Wedges',putter:'Putter'};
 // club types: woods are single clubs, irons and wedges are sets
 const TYPES={
- driver:{slot:'wood',n:'Driver',loft:10.5,c:252,l:.10,cv:1.0,fg:.42,deck:.8,spin:.1,txt:'Longest club there is. Low flight, small sweet spot, best off the tee.'},
- w3:{slot:'wood',n:'3 Wood',loft:15,c:228,l:.12,cv:.95,fg:.45,deck:.9,spin:.15,txt:'Long off the tee and the deck, but a shallow face that punishes misses.'},
- w5:{slot:'wood',n:'5 Wood',loft:18,c:212,l:.14,cv:.78,fg:.65,deck:.98,spin:.22,txt:'Higher and softer than the 3 wood and far easier to hit.'},
- w7:{slot:'wood',n:'7 Wood',loft:21,c:199,l:.16,cv:.68,fg:.78,deck:1,spin:.28,txt:'The easiest wood. High, straight on average, great from the rough.'},
- blade:{slot:'irons',n:'Blades',fg:-.15,spin:.1,d:1,la:.95,txt:'Tiny sweet spot, low flight, the most control.'},
- cavity:{slot:'irons',n:'Players cavity',fg:0,spin:0,d:1,la:1,txt:'The balance between feel and forgiveness.'},
- gi:{slot:'irons',n:'Game improvement',fg:.15,spin:-.08,d:1.03,la:1.07,txt:'Launches high, goes far, forgives a lot.'},
+ woods:{slot:'long',n:'Woods',cn:'Wood',club:'wood',loft:15,c:246,l:.12,cv:1.0,fg:.42,deck:.92,spin:.15,work:.9,txt:'Goes far with a medium flight. Hard to hit.'},
+ hybrid:{slot:'long',n:'Hybrids',cn:'Hybrid',club:'hybrid',loft:19,c:228,l:.10,cv:.75,fg:.68,deck:1,spin:.25,work:.7,txt:'Also long, flies lower and is much easier to hit.'},
+ longiron:{slot:'long',n:'Long irons',cn:'Long iron',club:'iron',loft:17,c:256,l:.075,cv:1.05,fg:.3,deck:1,spin:.3,work:1.25,txt:'The longest and lowest. The hardest club in the game, great in the wind.'},
+ blade:{slot:'irons',n:'Blades',fg:-.15,spin:.1,d:1,la:.95,work:1.35,txt:'Tiny sweet spot, low flight, the most control.'},
+ cavity:{slot:'irons',n:'Players cavity',fg:0,spin:0,d:1,la:1,work:1,txt:'The balance between feel and forgiveness.'},
+ gi:{slot:'irons',n:'Game improvement',fg:.15,spin:-.08,d:1.03,la:1.07,work:.5,txt:'Launches high, goes far and forgives a lot, but barely shapes the ball.'},
  tour:{slot:'wedges',n:'Tour grind',fg:-.1,spin:.12,txt:'Most spin and the narrowest windows.'},
  allround:{slot:'wedges',n:'All round',fg:0,spin:0,txt:'Does a bit of everything.'},
  wide:{slot:'wedges',n:'Wide sole',fg:.12,spin:-.12,sand:.06,txt:'Forgiving, great in the sand, less spin.'},
@@ -438,20 +438,16 @@ const TYPES={
 };
 // cards: d distance, f forgiveness, la launch, cvm curve, spin, face
 const CARDS=[
- {id:'d_oak',type:'driver',name:'Oakridge Starter',r:'common'},
- {id:'d_hal',type:'driver',name:'Halden Max 10K',r:'rare',d:.985,f:.2,la:1.08,txt:'Huge sweet spot. A touch shorter, much straighter.'},
- {id:'d_ves',type:'driver',name:'Vesper Draw',r:'rare',f:.08,cvm:.82,txt:'Built to fight the slice.'},
- {id:'d_kes',type:'driver',name:'Kestrel LS Tour',r:'epic',d:1.05,f:-.1,la:.86,txt:'Low spin bullet. Longest and lowest, hard to hit.'},
- {id:'d_mar',type:'driver',name:'Marlowe Titan',r:'legend',d:1.06,f:.08,la:.95,txt:'Long and kind. The one everyone wants.'},
- {id:'w3_oak',type:'w3',name:'Oakridge 3',r:'common'},
- {id:'w3_kes',type:'w3',name:'Kestrel Tour 3',r:'rare',d:1.03,f:-.05,la:.9,txt:'Penetrating, for the wind.'},
- {id:'w3_hal',type:'w3',name:'Halden Max 3',r:'epic',f:.16,la:1.06,txt:'A 3 wood that behaves like a 5.'},
- {id:'w5_oak',type:'w5',name:'Oakridge 5',r:'common'},
- {id:'w5_hal',type:'w5',name:'Halden Max 5',r:'rare',f:.1,la:1.05},
- {id:'w5_mar',type:'w5',name:'Marlowe Titan 5',r:'epic',d:1.03,f:.06},
- {id:'w7_oak',type:'w7',name:'Oakridge 7',r:'common'},
- {id:'w7_hal',type:'w7',name:'Halden Max 7',r:'rare',f:.08,la:1.05},
- {id:'w7_mar',type:'w7',name:'Marlowe Titan 7',r:'legend',d:1.04,f:.08,txt:'Effortless height and distance.'},
+ {id:'lw_oak',type:'woods',name:'Oakridge Wood',r:'common'},
+ {id:'lw_hal',type:'woods',name:'Halden Max Wood',r:'rare',d:.985,f:.16,la:1.07,txt:'Huge sweet spot. A touch shorter, much straighter.'},
+ {id:'lw_kes',type:'woods',name:'Kestrel Tour Wood',r:'epic',d:1.04,f:-.06,la:.88,txt:'Low spin bullet. Longer, lower, less forgiving.'},
+ {id:'lw_mar',type:'woods',name:'Marlowe Titan Wood',r:'legend',d:1.05,f:.08,txt:'Long and kind. The one everyone wants.'},
+ {id:'lh_oak',type:'hybrid',name:'Oakridge Rescue',r:'common'},
+ {id:'lh_hal',type:'hybrid',name:'Halden Hybrid',r:'rare',f:.08,la:1.05},
+ {id:'lh_ves',type:'hybrid',name:'Vesper Utility',r:'epic',d:1.03,f:.04,txt:'Hybrid forgiveness with a little extra pop.'},
+ {id:'li_oak',type:'longiron',name:'Oakridge Long Iron',r:'common'},
+ {id:'li_kes',type:'longiron',name:'Kestrel Driving Iron',r:'rare',f:.06,la:1.05,txt:'A long iron with a wider sole. Still low, a bit kinder.'},
+ {id:'li_mar',type:'longiron',name:'Marlowe Blade 2',r:'legend',d:1.03,f:.05,txt:'The longest club in the game for those who can hit it.'},
  {id:'i_kmb',type:'blade',name:'Kestrel MB',r:'rare',txt:'Pure muscle back blades.'},
  {id:'i_mfo',type:'blade',name:'Marlowe Forged',r:'legend',d:1.02,f:.06,txt:'Blade looks with a hidden safety net.'},
  {id:'i_oak',type:'cavity',name:'Oakridge CB',r:'common'},
@@ -482,20 +478,23 @@ const PARTS=[
  {id:'g_gold',kind:'grip',name:'Champion wrap',r:'legend',face:1.2,low:1.15,back:1.1,txt:'The best grip money can open.'}
 ];
 const cardById=id=>CARDS.find(c=>c.id===id),partById=id=>PARTS.find(p=>p.id===id);
-function newInv(){
- const inv={coins:250,cards:[],parts:[],eq:{},next:1};
- for(const id of['d_oak','w5_oak','i_oak','wd_oak','p_oak']){const u=inv.next++;inv.cards.push({uid:u,id,lvl:1,shaft:null,grip:null});}
- inv.eq={wood:1,irons:3,wedges:4,putter:5};
- return inv;
-}
+function newInv(){return{coins:250,cards:[],parts:[],eq:{},next:1};}
 if(!DB.inv||!Array.isArray(DB.inv.cards))DB.inv=newInv();
 const INV=DB.inv;
+// every club, shaft and grip is unlocked on this account
+INV.cards=INV.cards.filter(c=>CARDS.some(k=>k.id===c.id));
+for(const k of CARDS)if(!INV.cards.some(c=>c.id===k.id))INV.cards.push({uid:INV.next++,id:k.id,lvl:1,shaft:null,grip:null});
+INV.parts=PARTS.map(x=>x.id);
+delete INV.eq.wood;
+if(!INV.eq.long||!INV.cards.some(c=>c.uid===INV.eq.long))INV.eq.long=INV.cards.find(c=>c.id==='lh_oak').uid;
+for(const[slot,id]of[['irons','i_oak'],['wedges','wd_oak'],['putter','p_oak']])if(!INV.cards.some(c=>c.uid===INV.eq[slot]))INV.eq[slot]=INV.cards.find(c=>c.id===id).uid;
+save();
 function slotOf(card){return TYPES[cardById(card.id).type].slot;}
 function ownedCard(uid){return INV.cards.find(c=>c.uid===uid);}
 function cardStats(card){
  const cat=cardById(card.id),T=TYPES[cat.type],sh=card.shaft?partById(card.shaft):null,gr=card.grip?partById(card.grip):null,L=(card.lvl||1)-1;
- return{d:(cat.d||1)*(T.d||1)*((sh&&sh.d)||1)*(1+L*.006),f:(cat.f||0)+(T.fg&&T.slot!=='wood'?T.fg:0)+((sh&&sh.fg)||0)+L*.012,la:(cat.la||1)*(T.la||1)*((sh&&sh.la)||1),cvm:cat.cvm||1,
-  spin:(cat.spin||0)+(T.slot!=='wood'?(T.spin||0):0),face:(T.face||1)*(cat.face||1)*((gr&&gr.face)||1),low:(gr&&gr.low)||1,back:((gr&&gr.back)||1)*(T.len||1),tempo:(sh&&sh.tempo)||1,sand:T.sand||0};
+ return{d:(cat.d||1)*(T.d||1)*((sh&&sh.d)||1)*(1+L*.006),f:(cat.f||0)+(T.fg&&T.slot!=='long'?T.fg:0)+((sh&&sh.fg)||0)+L*.012,la:(cat.la||1)*(T.la||1)*((sh&&sh.la)||1),cvm:cat.cvm||1,
+  spin:(cat.spin||0)+(T.slot!=='long'?(T.spin||0):0),face:(T.face||1)*(cat.face||1)*((gr&&gr.face)||1),low:(gr&&gr.low)||1,back:((gr&&gr.back)||1)*(T.len||1),tempo:(sh&&sh.tempo)||1,sand:T.sand||0};
 }
 const IRONS=[['4i','4 Iron',23,194,.15,.9,.36,.34],['5i','5 Iron',26,184,.17,.82,.44,.4],['6i','6 Iron',29,173,.19,.75,.52,.45,4.0],['7i','7 Iron',33,162,.21,.68,.58,.5,3.4],['8i','8 Iron',37,150,.23,.62,.63,.55,2.8],['9i','9 Iron',41,138,.25,.56,.67,.62,2.2]];
 const WEDGES=[['pw','Pitching Wedge',46,125,.27,.5,.72,.7,1.7,1.2],['gw','Gap Wedge',50,110,.29,.47,.7,.8,0,.95],['sw','Sand Wedge',56,95,.32,.44,.66,.9,0,.72],['lw','Lob Wedge',60,78,.38,.4,.55,1,0,.5]];
@@ -503,15 +502,15 @@ let CLUBS=[];
 function buildBag(){
  CLUBS=[];
  const get=slot=>{let c=ownedCard(INV.eq[slot]);if(!c||slotOf(c)!==slot){c=INV.cards.find(x=>slotOf(x)===slot);if(c)INV.eq[slot]=c.uid;}return c;};
- const wc=get('wood');
- if(wc){const cat=cardById(wc.id),T=TYPES[cat.type],st=cardStats(wc);CLUBS.push({id:cat.type,n:T.n,brand:cat.name,type:'wood',loft:T.loft,c:T.c*st.d,l:T.l*st.la,cv:T.cv*st.cvm,fg:clamp(T.fg+st.f,.15,.95),deck:T.deck,spin:T.spin,mods:st});}
+ const lc=get('long');
+ if(lc){const cat=cardById(lc.id),T=TYPES[cat.type],st=cardStats(lc);CLUBS.push({id:cat.type,n:T.cn,brand:cat.name,type:T.club,cat:'long',loft:T.loft,c:T.c*st.d,l:T.l*st.la,cv:T.cv*st.cvm,fg:clamp(T.fg+st.f,.15,.95),deck:T.deck,spin:T.spin,work:T.work,mods:st});}
  const ic=get('irons');
- if(ic){const cat=cardById(ic.id),st=cardStats(ic);for(const[id,n,loft,c,l,cv,fg,spin,bump]of IRONS)CLUBS.push({id,n,brand:cat.name,type:'iron',loft,c:c*st.d,l:l*st.la,cv:cv*st.cvm,fg:clamp(fg+st.f,.15,.95),spin:clamp(spin+st.spin,0,1),bump,mods:st});}
+ if(ic){const cat=cardById(ic.id),T=TYPES[cat.type],st=cardStats(ic);for(const[id,n,loft,c,l,cv,fg,spin,bump]of IRONS)CLUBS.push({id,n,brand:cat.name,type:'iron',cat:'irons',loft,c:c*st.d,l:l*st.la,cv:cv*st.cvm,fg:clamp(fg+st.f,.15,.95),spin:clamp(spin+st.spin,0,1),bump,work:T.work,mods:st});}
  const wd=get('wedges');
- if(wd){const cat=cardById(wd.id),st=cardStats(wd);for(const[id,n,loft,c,l,cv,fg,spin,bump,chip]of WEDGES)CLUBS.push({id,n,brand:cat.name,type:'wedge',loft,c:c*st.d,l,cv,fg:clamp(fg+st.f,.15,.95),spin:clamp(spin+st.spin,.2,1.1),bump:bump||undefined,chip,sand:st.sand,mods:st});}
+ if(wd){const cat=cardById(wd.id),st=cardStats(wd);for(const[id,n,loft,c,l,cv,fg,spin,bump,chip]of WEDGES)CLUBS.push({id,n,brand:cat.name,type:'wedge',cat:'wedges',loft,c:c*st.d,l,cv,fg:clamp(fg+st.f,.15,.95),spin:clamp(spin+st.spin,.2,1.1),bump:bump||undefined,chip,sand:st.sand,work:1.1,mods:st});}
  const pc=get('putter');
  const pst=pc?cardStats(pc):{face:1,back:1,low:1,tempo:1};
- CLUBS.push({id:'pt',n:'Putter',brand:pc?cardById(pc.id).name:'',type:'putter',loft:3,c:0,l:0,cv:0,fg:.6,spin:0,putter:true,mods:pst});
+ CLUBS.push({id:'pt',n:'Putter',brand:pc?cardById(pc.id).name:'',type:'putter',cat:'putter',work:1,loft:3,c:0,l:0,cv:0,fg:.6,spin:0,putter:true,mods:pst});
  CLUBS.sort((a,b)=>(a.putter?1:0)-(b.putter?1:0)||b.c-a.c);
 }
 buildBag();
@@ -534,7 +533,7 @@ function lieMult(s,c){
  if(s==='sand'){if(c.type==='wedge')return Math.min(.95,(c.loft>=54?.86:.68)+(c.sand||0));if(c.type==='wood')return .42;return .55;}
  if(s==='fairway')return c.type==='wood'?c.deck:1;
  if(s==='cut')return c.type==='hybrid'?.97:c.type==='wood'?c.deck*.94:.92;
- if(s==='rough')return c.type==='hybrid'?.9:c.type==='wood'?(c.fg>.6?.84:.7):c.type==='wedge'?.86:.8;
+ if(s==='rough')return c.type==='hybrid'?.9:c.type==='wood'?(c.fg>.6?.84:.74):c.type==='wedge'?.86:c.cat==='long'?.7:.8;
  if(s==='deep')return c.type==='hybrid'?.74:c.type==='wood'?.5:c.type==='wedge'?.7:.6;
  return SURF[s]?SURF[s].lie:1;
 }
@@ -734,6 +733,9 @@ const ball={x:0,y:0,z:0,vx:0,vy:0,vz:0,g:0,ax:0,ay:0,mode:'rest',b:0,trail:[],hi
 let ci=0, aim=0, lie='tee', strokes=0, putts=0, shotStart=null, shotLie='tee', shotClub=0, shotMode='full', landEst=null;
 let traces=[], viewAll=false, timer=0, holeStat=null, pinFtStart=0;
 let mode='full', spinLv=1, ph=0;
+let shapeLv=0;const SHAPES=[[-1,'Draw'],[0,'Straight'],[1,'Fade']];
+function shapeCurve(){const c=CLUBS[ci];return mode==='full'?shapeLv*5.5*(c.work||1):0;}
+function shapeLat(d){const T=1.15+d/110;return .5*shapeCurve()*T*T;}
 const SPIN=['Low','Mid','High'], SPINV=[.3,.65,1], FLIGHT_APEX=[.5,1,1.55];
 const meter={pos:0,v:0};
 const sw={osc:0,v:{},scores:[],last:null};
@@ -792,7 +794,7 @@ function maxDist(){
 function chipRatio(c,sd,zip){return zip?-.07:(c.chip||.8)*(1-sd*.8);}
 // the preview assumes clean contact, so it shows what a well struck chip does, zip included
 function planRatio(){const c=CLUBS[ci];if(mode==='bump')return c.bump||2.5;if(mode==='chip'){const sd=Math.min(1.1,SPINV[spinLv]*c.spin*1.1);return chipRatio(c,sd,spinLv===2&&sd>.85);}return 0;}
-function landingPoint(full){const d=full?maxDist():Math.min(plan,maxDist());return{x:ball.x+Math.cos(aim)*d,y:ball.y+Math.sin(aim)*d};}
+function landingPoint(full){const d=full?maxDist():Math.min(plan,maxDist()),lat=shapeLat(d);return{x:ball.x+Math.cos(aim)*d-Math.sin(aim)*lat,y:ball.y+Math.sin(aim)*d+Math.cos(aim)*lat};}
 function defaultPlan(){
  const D=distPin();
  if(mode==='chip'||mode==='bump'){
@@ -870,8 +872,18 @@ function setMode(m){
 }
 function cycleMode(){const ms=modesFor();setMode(ms[(ms.indexOf(mode)+1)%ms.length]);}
 function setSpin(i){if(state!=='aim'||mode!=='chip')return;spinLv=clamp(i,0,2);if(!planUser)plan=defaultPlan();frameShot();updateHUD();sfx.tick();}
+const CATS=['long','irons','wedges'];
+function catMax(cat){let m=0;for(const c of CLUBS)if(c.cat===cat)m=Math.max(m,c.c*lieMult(lie,c));return m;}
+// inside a category the game picks the shortest club that still reaches the planned distance
+function pickInCat(cat,dist){const list=CLUBS.map((c,i)=>i).filter(i=>CLUBS[i].cat===cat).sort((a,b)=>CLUBS[a].c-CLUBS[b].c);for(const i of list)if(CLUBS[i].c*lieMult(lie,CLUBS[i])>=dist*.98)return i;return list[list.length-1];}
+function setCat(cat){
+ if(state!=='aim'||mode!=='full'||!CLUBS.some(c=>c.cat===cat))return;
+ const d=planUser?Math.min(plan,catMax(cat)):Math.min(distPin(),catMax(cat));
+ ci=pickInCat(cat,d);plan=planUser?Math.min(plan,maxDist()):defaultPlan();frameShot();updateHUD();sfx.tick();
+}
 function setClub(delta){
  if(state!=='aim')return;
+ if(mode==='full'){const cats=CATS.filter(c=>CLUBS.some(k=>k.cat===c));let j=cats.indexOf(CLUBS[ci].cat);setCat(cats[clamp(j+delta,0,cats.length-1)]);return;}
  const idx=clubsFor(mode);let j=idx.indexOf(ci);if(j<0)j=0;
  j=clamp(j+delta,0,idx.length-1);if(idx[j]===ci)return;ci=idx[j];
  plan=planUser?Math.min(plan,maxDist()):defaultPlan();frameShot();updateHUD();sfx.tick();
@@ -925,6 +937,7 @@ function setupShot(){
  ci=clubForMode(mode);
  aim=autoAim();
  plan=defaultPlan();planUser=false;
+ if(mode==='full'){const d=Math.min(plan,maxDist());aim-=Math.atan2(shapeLat(d),d);}
  ball.z=0;ball.mode='rest';ball.trail=[];
  state='aim';ph=0;sw.trans=null;scoreDim();
  frameShot();updateHUD();
@@ -950,7 +963,7 @@ function spinWin(){return mode==='chip'?[1.3,1,.76][spinLv]:1;}
 function wins(){
  const k=forgive(),g=game();
  const m=(CLUBS[ci]&&CLUBS[ci].mods)||{};const M=x=>m[x]||1;
- if(g==='full')return{b:.03*k*M('back'),t:.1*k*M('tempo'),f:.075*k*M('face'),l:.065*k*M('low')};
+ if(g==='full'){const wk=CLUBS[ci].work||1,sh=shapeLv&&mode==='full'?clamp(wk,.55,1.2):1;return{b:.03*k*M('back'),t:.1*k*M('tempo'),f:.075*k*M('face')*sh,l:.065*k*M('low'),ft:mode==='full'?shapeLv*.32:0};}
  if(g==='chip')return{h:.08*k*spinWin(),b:.025*k*M('back'),l:.018*k*spinWin()*M('low')};
  return{f:.09*M('face'),b:.03*M('back'),s:.035};
 }
@@ -977,7 +990,7 @@ function swingAction(){
  if(g==='full'){
   if(ph===0){sw.v.power=meter.pos;const d=meter.pos-sw.v.plannedP;sw.scores[0]=Math.max(1,sc(d,w.b)-Math.round(Math.max(0,meter.pos-1)*120));sw.v.tt=0;sfx.lock();}
   else if(ph===1){sw.v.t=sw.v.tt/TEMPO_IDEAL;sw.scores[1]=sc(sw.v.t-1,w.t);sfx.tick();}
-  else if(ph===2){sw.v.f=sw.v.fp;sw.scores[2]=sc(sw.v.fp,w.f);sfx.tick();}
+  else if(ph===2){sw.v.f=sw.v.fp-(w.ft||0);sw.scores[2]=sc(sw.v.f,w.f);sfx.tick();}
   else{sw.v.final=meter.pos;finalScore();}
   scoreReveal(ph);startTrans();updateHint();return;
  }
@@ -1107,7 +1120,8 @@ function hit(){
   else if(n<0){const m=-n;carry*=Math.max(.35,1-(m<1.5?.07*m:.1+.13*(m-1.5)));apexMul=1-Math.min(.35,m*.06);vL=m<1.5?'Fat':'Heavy';}
   else{const m=n;carry*=Math.max(.5,1-(m<1.5?.04*m:.06+.07*(m-1.5)));apexMul=Math.max(.2,1-m*.18);ball.rollBonus=1+Math.min(1,m*.25);vL=m<1.5?'Thin':'Very thin';}
   const deg=Math.abs(f*9/k).toFixed(1);
-  const vF=fEff===0?'Square':f>0?`Open ${deg}° · ${f>.35?'slice':'fade'}`:`Closed ${deg}° · ${f<-.35?'hook':'draw'}`;
+  const shp=mode==='full'?shapeLv:0;
+  const vF=fEff===0?(shp?(shp<0?'Draw on plan':'Fade on plan'):'Square'):f>0?`Open ${deg}° · ${f>.35?'slice':'fade'}`:`Closed ${deg}° · ${f<-.35?'hook':'draw'}`;
   const vT=eEff===0?'Smooth':e<0?(e<-.3?'Rushed':'Quick'):(e>.3?'Lazy':'Slow');
   verdicts=[vB,vT,vF,vL];
   // face: open starts it right and curves it right, closed the other way
@@ -1120,7 +1134,7 @@ function hit(){
    const T=1.15+carry/110,apex=Math.max(topped?.3:1.2,carry*c.l*(lie==='sand'?1.1:1)*apexMul);
    ball.g=8*apex/(T*T);ball.vz=4*apex/T;
    ball.vx=Math.cos(ang)*carry/T;ball.vy=Math.sin(ang)*carry/T;
-   const ca=fEff*16*c.cv/k;
+   const ca=fEff*16*c.cv*(c.work||1)/k+shapeCurve();
    ball.ax=-Math.sin(aim)*ca;ball.ay=Math.cos(aim)*ca;
   }
   ball.mode='fly';ball.z=.01;
@@ -1358,12 +1372,12 @@ function drawMeter(){
   }else if(si===2){
    // club face gauge: the face swings from open to closed, the yellow sliver is square
    dark();const F=v=>mid+v*(half-12);
-   mx.fillStyle='rgba(246,197,27,.9)';mx.fillRect(F(-wv.f),ty-3,F(wv.f)-F(-wv.f),th+6);
+   const ft=wv.ft||0;mx.fillStyle='rgba(246,197,27,.9)';mx.fillRect(F(ft-wv.f),ty-3,F(ft+wv.f)-F(ft-wv.f),th+6);
    mx.fillStyle='rgba(243,246,238,.5)';mx.fillRect(mid-.5,ty-4,1,th+8);
    for(let k=1;k<5;k++){const o=(half-12)*k/5;mx.fillRect(mid-o-.5,ty+5,1,th-10);mx.fillRect(mid+o-.5,ty+5,1,th-10);}
    const fp=sw.v.fp===undefined?1:sw.v.fp;
-   mx.save();mx.translate(F(fp),ty+th/2);mx.rotate(fp*.55);mx.fillStyle=Math.abs(fp)<wv.f?'#f6c51b':'#f3f6ee';mx.strokeStyle='rgba(0,0,0,.5)';mx.lineWidth=1;mx.fillRect(-2,-th/2-5,4,th+10);mx.strokeRect(-2,-th/2-5,4,th+10);mx.restore();
-   small('CLOSED · HOOK',tx);small('SQUARE',mid,'center');small('OPEN · SLICE',tx+tw,'right');
+   mx.save();mx.translate(F(fp),ty+th/2);mx.rotate(fp*.55);mx.fillStyle=Math.abs(fp-ft)<wv.f?'#f6c51b':'#f3f6ee';mx.strokeStyle='rgba(0,0,0,.5)';mx.lineWidth=1;mx.fillRect(-2,-th/2-5,4,th+10);mx.strokeRect(-2,-th/2-5,4,th+10);mx.restore();
+   small('CLOSED · HOOK',tx);small(ft<0?'DRAW':ft>0?'FADE':'SQUARE',F(ft),'center');small('OPEN · SLICE',tx+tw,'right');
   }else{
    // low point bar: fat on the left, thin on the right, chunk and top at the far ends
    const Lx=v=>mid+v*(half-4);
@@ -1506,7 +1520,7 @@ function drawAim(){
  ctx.save();
  ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=Math.max(.12,1.6/s);
  ctx.setLineDash([6/s,6/s]);
- ctx.beginPath();ctx.moveTo(ball.x,ball.y);ctx.lineTo(L.x,L.y);ctx.stroke();ctx.setLineDash([]);
+ {const dd=Math.min(plan,maxDist()),lat=shapeLat(dd),ca=Math.cos(aim),sa=Math.sin(aim);ctx.beginPath();ctx.moveTo(ball.x,ball.y);for(let i=1;i<=24;i++){const t=i/24;ctx.lineTo(ball.x+ca*dd*t-sa*lat*t*t,ball.y+sa*dd*t+ca*lat*t*t);}ctx.stroke();ctx.setLineDash([]);}
  let stop=null;
  if(mode==='putt'){
   ctx.lineWidth=Math.max(.06,1.2/s);
@@ -1836,14 +1850,17 @@ const DRILL_NAME={full:'Full swing',chip:'Chipping',putt:'Putting'};
 function renderShotRow(){
  const row=$('shotRow');
  const ms=state==='aim'||state==='intro'?modesFor():[mode];
- const show=ms.length>1||mode==='chip';
+ const show=ms.length>1||mode==='chip'||mode==='full';
  let h='';
  if(ms.length>1)h+=`<div class="seg"><span class="sl">Shot</span>${ms.map(m=>`<button data-m="${m}" aria-pressed="${m===mode}">${MODE_NAME[m]}</button>`).join('')}</div>`;
+ if(mode==='full'&&state==='aim'){const cats=CATS.filter(c=>CLUBS.some(k=>k.cat===c));h+=`<div class="seg"><span class="sl">Club</span>${cats.map(c=>`<button data-c="${c}" aria-pressed="${CLUBS[ci].cat===c}">${CATN[c]}</button>`).join('')}</div>`;
+  h+=`<div class="seg"><span class="sl">Shape</span>${SHAPES.map(([v,n])=>`<button data-sh="${v}" aria-pressed="${v===shapeLv}">${n}</button>`).join('')}</div>`;}
  if(mode==='chip')h+=`<div class="seg"><span class="sl">Flight</span>${SPIN.map((s,i)=>`<button data-s="${i}" aria-pressed="${i===spinLv}">${s}</button>`).join('')}</div>`;
  if(row.dataset.h!==h){row.innerHTML=h;row.dataset.h=h;}
  if(row.hidden===show){row.hidden=!show;measureVR();}
 }
-$('shotRow').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;audio();if(b.dataset.m)setMode(b.dataset.m);else if(b.dataset.s)setSpin(+b.dataset.s);});
+$('shotRow').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;audio();if(b.dataset.m)setMode(b.dataset.m);else if(b.dataset.s)setSpin(+b.dataset.s);else if(b.dataset.c)setCat(b.dataset.c);else if(b.dataset.sh!==undefined)setShape(+b.dataset.sh);});
+function setShape(v){if(state!=='aim'||mode!=='full')return;const d=Math.min(plan,maxDist());aim+=Math.atan2(shapeLat(d),d);shapeLv=v;aim-=Math.atan2(shapeLat(d),d);frameShot();updateHUD();sfx.tick();}
 function updateHUD(){
  if(!G||!hole)return;
  if(train()){
@@ -1864,9 +1881,9 @@ function updateHUD(){
  $('windTxt').textContent=`${hole.wind.mph} mph`;
  $('windArrow').style.transform=`rotate(${(hole.wind.a+cam.rot)*180/Math.PI}deg)`;
  const c=CLUBS[ci];
- $('cName').textContent=c.n;
+ $('cName').textContent=mode==='full'?CATN[c.cat]:c.n;
  const md=Math.round(maxDist());
- $('cDist').textContent=mode==='putt'?`${Math.round(putterRange()*3)} ft range`:mode==='chip'?`Chip to ${md} yd · ${c.loft}°`:mode==='bump'?`Bump to ${md} yd`:`${md} yd carry`;
+ $('cDist').textContent=mode==='putt'?`${Math.round(putterRange()*3)} ft range`:mode==='chip'?`Chip to ${md} yd · ${c.loft}°`:mode==='bump'?`Bump to ${md} yd`:`${c.n} · ${md} yd`;
  const D=distPin();
  const onG=lie==='green'||lie==='fringe';
  $('rPin').textContent=D<15?fmtFt(D):`${Math.round(D)} yd`;
@@ -1982,11 +1999,12 @@ function showMenu(){
 }
 
 /* ---------- myNolan: equip one card per slot, fit shafts and grips ---------- */
-let bagSlot='wood',bagSel=null,bagDone=null;
+let bagSlot='long',bagSel=null,bagDone=null;
 const FIT_COST=25,lvlCost=l=>60+l*60;
 function cardDisplay(card){
  const cat=cardById(card.id),T=TYPES[cat.type],st=cardStats(card);
- if(T.slot==='wood')return[['Distance',(T.c*st.d-185)/75,`${Math.round(T.c*st.d)} yd`],['Forgive',T.fg+st.f,''],['Launch',(T.l*st.la-.07)/.12,'']];
+ if(T.slot==='long')return[['Distance',(T.c*st.d-200)/65,`${Math.round(T.c*st.d)} yd`],['Forgive',T.fg+st.f,''],['Launch',(T.l*st.la-.05)/.1,'']];
+ if(T.slot==='irons')return[['7 iron',(162*st.d-150)/25,`${Math.round(162*st.d)} yd`],['Forgive',.58+st.f,''],['Shaping',(T.work-.3)/1.1,'']];
  if(T.slot==='irons')return[['7 iron',(162*st.d-150)/25,`${Math.round(162*st.d)} yd`],['Forgive',.58+st.f,''],['Launch',(.21*st.la-.17)/.08,'']];
  if(T.slot==='wedges')return[['Spin',.55+st.spin*2.5,''],['Forgive',.62+st.f,''],['Sand',.5+st.sand*5,'']];
  return[['Square',(st.face-.7)/.9,''],['Pace feel',(st.back-.8)/.45,''],['Forgive',.5+(st.face-1)*.8,'']];
@@ -2174,7 +2192,11 @@ function setAimFromScreen(px,py){
  const [wx,wy]=s2w(px,py);
  if(hyp(wx-ball.x,wy-ball.y)*cam.s<8)return;
  aim=Math.atan2(wy-ball.y,wx-ball.x);
- const md=maxDist();plan=clamp(hyp(wx-ball.x,wy-ball.y),mode==='putt'?1:mode==='full'?md*.12:1,md);planUser=true;
+ let md=maxDist();
+ if(mode==='full'&&CLUBS[ci].cat!=='long'){const cat=CLUBS[ci].cat;ci=pickInCat(cat,Math.min(hyp(wx-ball.x,wy-ball.y),catMax(cat)));md=maxDist();}
+ plan=clamp(hyp(wx-ball.x,wy-ball.y),mode==='putt'?1:mode==='full'?md*.12:1,md);planUser=true;
+ // with a draw or fade, aim off so the curve lands on the pointer
+ if(mode==='full'){const lat=shapeLat(plan);aim-=Math.atan2(lat,plan);}
  const L=landingPoint(true);const sp=w2s(L.x,L.y);
  if(!viewAll&&(sp[0]<30||sp[0]>W-30||sp[1]<VR.y+20||sp[1]>VR.y+VR.h-20))frameShot();
 }
@@ -2243,7 +2265,7 @@ function loop(now){
  update(dt);render();
  requestAnimationFrame(loop);
 }
-window.__golf={get state(){return state},get ph(){return ph},get mode(){return mode},get ball(){return ball},get hole(){return hole},get aim(){return aim},get tut(){return tut},get last(){return sw.last},get clubs(){return CLUBS.map(c=>c.id)},swingAction,startDaily,startTraining,setMode,setSpin,_dbg:()=>({osc:oscVal(),pos:meter.pos,fp:sw.v&&sw.v.fp,tt:sw.v&&sw.v.tt,pp:sw.v&&sw.v.plannedP,w:wins(),g:game(),stop:(mode==='chip'||mode==='bump')?predictStop(landingPoint()):null,land:landingPoint(),pin:hole.pin}),surfaceAt:(x,y)=>surfaceAt(x,y)};
+window.__golf={get state(){return state},get ph(){return ph},get mode(){return mode},get ball(){return ball},get hole(){return hole},get aim(){return aim},get tut(){return tut},get last(){return sw.last},get clubs(){return CLUBS.map(c=>c.id)},get club(){return CLUBS[ci]&&{id:CLUBS[ci].id,cat:CLUBS[ci].cat,n:CLUBS[ci].n}},setCat:c=>setCat(c),setShape:v=>setShape(v),swingAction,startDaily,startTraining,setMode,setSpin,_dbg:()=>({osc:oscVal(),pos:meter.pos,fp:sw.v&&sw.v.fp,tt:sw.v&&sw.v.tt,pp:sw.v&&sw.v.plannedP,w:wins(),g:game(),stop:(mode==='chip'||mode==='bump')?predictStop(landingPoint()):null,land:landingPoint(),pin:hole.pin}),surfaceAt:(x,y)=>surfaceAt(x,y)};
 resize();
 showMenu();
 requestAnimationFrame(loop);
