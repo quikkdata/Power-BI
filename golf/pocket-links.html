@@ -62,15 +62,18 @@ button:focus-visible{outline:2px solid var(--flag);outline-offset:2px}
 .readout>div{display:flex;flex-direction:column;min-width:0}
 .readout b{font-family:var(--display);font-weight:700;font-size:1.2rem;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .meterwrap{display:flex;gap:8px;align-items:stretch}
-#meter{flex:1;position:relative;height:46px;background:rgba(12,36,24,.92);border-radius:4px;overflow:hidden}
-#mtrack{position:absolute;left:12px;right:12px;top:10px;height:16px;border-radius:2px;background:linear-gradient(90deg,#2a5a3e,#3f7d4f 60%,#7aa84a 84%,#c4a33a 84.7%,#c4572f)}
-#mzone{position:absolute;top:-3px;bottom:-3px;background:var(--flag);border-radius:2px}
-#mperfect{position:absolute;top:-5px;bottom:-5px;width:2px;margin-left:-1px;background:var(--chalk)}
-#mfull{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:rgba(243,246,238,.7)}
-#mlock{position:absolute;top:-6px;bottom:-6px;width:4px;margin-left:-2px;background:var(--red);border-radius:2px}
-#mneedle{position:absolute;top:-8px;bottom:-8px;width:3px;margin-left:-1.5px;background:var(--chalk);box-shadow:0 0 0 1px rgba(0,0,0,.5)}
-#mticks{position:absolute;left:12px;right:12px;bottom:4px;height:12px;font-family:var(--display);font-size:.62rem;font-weight:600;color:var(--fog);letter-spacing:.06em}
-#mticks span{position:absolute;transform:translateX(-50%)}
+#meter{flex:1;position:relative;height:66px;background:rgba(12,36,24,.92);border-radius:4px;overflow:hidden}
+#mc{position:absolute;inset:0;width:100%;height:100%;display:block}
+#report{position:absolute;left:0;right:0;bottom:100%;margin-bottom:8px;display:flex;align-items:stretch;background:rgba(12,36,24,.92);border-radius:4px;overflow:hidden;box-shadow:0 6px 22px rgba(0,0,0,.28);transition:opacity .25s}
+#report.fade{opacity:.55}
+.rp-tot{display:flex;flex-direction:column;justify-content:center;align-items:center;padding:6px 12px;border-right:1px solid var(--line);min-width:58px}
+.rp-tot b{font-family:var(--display);font-weight:800;font-style:italic;font-size:1.9rem;line-height:1}
+.rp-cells{flex:1;display:grid;grid-template-columns:repeat(4,1fr);min-width:0}
+.rp-cell{padding:6px 10px;display:flex;flex-direction:column;gap:1px;min-width:0;border-right:1px solid var(--line)}
+.rp-cell:last-child{border-right:0}
+.rp-cell b{font-family:var(--display);font-weight:800;font-size:1.25rem;line-height:1.05;font-variant-numeric:tabular-nums}
+.rp-cell span.v{font-size:.78rem;color:var(--fog);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-top{color:var(--flag)}.g-ok{color:var(--chalk)}.g-bad{color:var(--red)}
 #swing{display:none;flex:0 0 auto;border:0;border-radius:4px;background:var(--flag);color:var(--pine);font-family:var(--display);font-weight:800;font-style:italic;font-size:1.35rem;letter-spacing:.04em;padding:0 22px;min-width:110px}
 #swing:active{transform:translateY(1px);filter:brightness(.95)}
 body.touch #swing{display:block}
@@ -155,6 +158,11 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
   .cbody{min-width:96px}
   #cName{font-size:1.05rem}
   .stats{grid-template-columns:repeat(2,1fr)}
+  .rp-cell{padding:5px 6px}
+  .rp-cell b{font-size:1.05rem}
+  .rp-cell span.v{font-size:.68rem}
+  .rp-tot{min-width:46px;padding:5px 8px}
+  .rp-tot b{font-size:1.5rem}
   .panel{padding:18px}
 }
 @media (prefers-reduced-motion:reduce){#banner.show{animation-duration:2.4s;animation-timing-function:steps(1)}}
@@ -177,6 +185,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 </div>
 
 <div id="dock" hidden>
+  <div id="report" hidden><div class="rp-tot"><span class="lab">Swing</span><b id="rpTot">0</b></div><div class="rp-cells" id="rpCells"></div></div>
   <div class="dockrow">
     <div class="club">
       <button class="ib" id="cPrev" aria-label="Longer club">‹</button>
@@ -190,11 +199,8 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
     </div>
   </div>
   <div class="meterwrap">
-    <div id="meter">
-      <div id="mtrack"><div id="mzone"></div><div id="mperfect"></div><div id="mfull"></div><div id="mlock" hidden></div><div id="mneedle"></div></div>
-      <div id="mticks"></div>
-    </div>
-    <button id="swing">Swing</button>
+    <div id="meter"><canvas id="mc" aria-label="Swing meter"></canvas></div>
+    <button id="swing">Address</button>
   </div>
   <div id="hint"></div>
 </div>
@@ -210,11 +216,12 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
     <div class="modes" id="modes"></div>
     <div class="stats" id="stats"></div>
     <div class="how">
-      <b>How to swing.</b> Aim with the mouse (or drag on a phone). Then three clicks, or <b>Space</b> three times:
+      <b>How to swing.</b> Point at the spot you want to land on (or drag on a phone). Every swing has four clicks, or <b>Space</b> four times, and each one is scored out of 100:
       <ol>
-        <li><b>Start</b> the swing. The needle runs right.</li>
-        <li><b>Set power</b> where you want it. Past the white line is overswing: more distance, more risk.</li>
-        <li><b>Strike</b> as the needle comes back through the yellow zone. Early slices right, late hooks left.</li>
+        <li><b>Address.</b> Click when the bubble on the level is centered. Off center opens or closes your aim.</li>
+        <li><b>Backswing.</b> The needle runs right. Stop it on the dashed line, your planned distance. Past the white line is overswing.</li>
+        <li><b>Tempo.</b> Pause at the top. Click when the bar fills to the yellow window. Rushed hooks left, lazy slices right.</li>
+        <li><b>Low point.</b> Click as the needle comes back through the yellow zone. Early is thin, late is fat.</li>
       </ol>
       <div style="margin-top:8px"><b>Keys.</b> ← → fine aim (hold Shift for finer), ↑ ↓ or mouse wheel change club, V hole map, C scorecard, M sound, Esc cancel swing.</div>
     </div>
@@ -471,10 +478,13 @@ const sfx={
 
 /* ---------- state ---------- */
 let G=null, hole=null, state='menu';
-const ball={x:0,y:0,z:0,vx:0,vy:0,vz:0,g:0,ax:0,ay:0,mode:'rest',b:0,trail:[],treeHit:-1};
+const ball={x:0,y:0,z:0,vx:0,vy:0,vz:0,g:0,ax:0,ay:0,mode:'rest',b:0,trail:[],hitTrees:new Set(),t:0,rollBonus:1};
 let ci=0, aim=0, lie='tee', strokes=0, putts=0, shotStart=null, shotLie='tee', shotClub=0, landEst=null;
 let traces=[], viewAll=false, timer=0, holeStat=null, pinFtStart=0;
 const meter={pos:0,power:0,up:1,down:1.2};
+const sw={a:0,aPh:0,power:0,plannedP:1,tt:0,t:1,scores:[null,null,null,null],last:null};
+let plan=0,planUser=false;
+const TEMPO_IDEAL=.55;
 let particles=[], ripples=[], confetti=[], grains=[];
 let isTouch=matchMedia('(pointer:coarse)').matches;
 if(isTouch) document.body.classList.add('touch');
@@ -494,6 +504,7 @@ function measureVR(){
  if(!topEl.hidden) top=topEl.getBoundingClientRect().bottom+8;
  if(!dock.hidden) bot=Hh-dock.getBoundingClientRect().top+6;
  VR={x:0,y:top,w:W,h:Math.max(140,Hh-top-bot)};VR.cx=W/2;VR.cy=top+VR.h/2;
+ sizeMeter();
 }
 addEventListener('resize',resize);
 
@@ -508,17 +519,16 @@ function frame(points,pad,minSpan){
  cam.tx=mx*c+my*s;cam.ty=-mx*s+my*c;
 }
 function frameHole(){const H=hole,pts=[{x:-12,y:0},H.pin,...H.pts.filter((_,i)=>i%4===0)];const g=H.green;pts.push({x:g.x+H.gR,y:g.y},{x:g.x-H.gR,y:g.y},{x:g.x,y:g.y+H.gR},{x:g.x,y:g.y-H.gR});frame(pts,26,100);}
-function landingPoint(){
- const c=CLUBS[ci];
- if(c.putter){const R=putterRange();return{x:ball.x+Math.cos(aim)*R,y:ball.y+Math.sin(aim)*R};}
- const d=c.c*lieMult(lie,ci);return{x:ball.x+Math.cos(aim)*d,y:ball.y+Math.sin(aim)*d};
-}
+function maxDist(){const c=CLUBS[ci];return c.putter?putterRange():c.c*lieMult(lie,ci);}
+function landingPoint(full){const d=full?maxDist():Math.min(plan,maxDist());return{x:ball.x+Math.cos(aim)*d,y:ball.y+Math.sin(aim)*d};}
+function defaultPlan(){const D=hyp(hole.pin.x-ball.x,hole.pin.y-ball.y);return Math.min(D,maxDist());}
+function plannedPower(){return clamp(Math.min(plan,maxDist())/maxDist(),0,1);}
 function frameShot(){
  if(viewAll){frameHole();return;}
  const L=landingPoint(),D=hyp(hole.pin.x-ball.x,hole.pin.y-ball.y);
  const c=CLUBS[ci];
- if(c.putter){frame([ball,hole.pin,L],Math.max(3,D*.15),Math.max(9,D*1.1));return;}
- const pts=[ball,L];
+ if(c.putter){frame([ball,hole.pin,landingPoint(true)],Math.max(3,D*.15),Math.max(9,D*1.1));return;}
+ const pts=[ball,L,landingPoint(true)];
  const carry=c.c*lieMult(lie,ci);
  if(D<carry*1.35)pts.push(hole.pin);
  frame(pts,Math.max(10,carry*.12),Math.max(40,carry*.6));
@@ -548,6 +558,7 @@ function startHole(i){
  Object.assign(ball,{x:0,y:0,z:0,vx:0,vy:0,vz:0,mode:'rest',trail:[]});
  lie='tee';
  initGrains();
+ $('report').hidden=true;sw.last=null;
  $('menu').hidden=true;$('cardOv').hidden=true;
  $('top').hidden=false;$('dock').hidden=false;
  measureVR();
@@ -585,74 +596,173 @@ function setupShot(){
  const D=hyp(hole.pin.x-ball.x,hole.pin.y-ball.y);
  ci=autoClub(D,lie);
  aim=autoAim();
+ plan=defaultPlan();planUser=false;
  ball.z=0;ball.mode='rest';ball.trail=[];
  state='aim';
- frameShot();updateHUD();drawMeter();
+ frameShot();updateHUD();
 }
-function setClub(i){if(state!=='aim')return;ci=clamp(i,0,PUTTER);frameShot();updateHUD();sfx.tick();}
+function setClub(i){if(state!=='aim')return;ci=clamp(i,0,PUTTER);plan=planUser?Math.min(plan,maxDist()):defaultPlan();frameShot();updateHUD();sfx.tick();}
 
 /* ---------- swing ---------- */
+function addrPeriod(){if(CLUBS[ci].putter)return 2.3;return({tee:1.9,fairway:1.75,cut:1.65,fringe:1.9,green:2.1,rough:1.45,deep:1.25,sand:1.3})[lie]||1.7;}
+function grade(v){return v>=90?'g-top':v>=70?'g-ok':'g-bad';}
 function swingAction(){
  if(state==='intro'){endIntro();return;}
  if(state==='aim'){
-  state='swing1';meter.pos=0;meter.power=0;
+  sw.a=Math.sin(sw.aPh);
+  sw.scores=[Math.round(clamp(100-Math.abs(sw.a)*105,0,100)),null,null,null];
+  sw.plannedP=plannedPower();
   const c=CLUBS[ci];
-  meter.up=c.putter?.85:1.0;
+  meter.pos=0;meter.up=c.putter?.85:1.0;
   meter.down=c.putter?.95:(lie==='rough'?1.35:lie==='deep'?1.55:lie==='sand'?1.5:1.18);
-  $('mlock').hidden=true;sfx.tick();updateHint();return;
+  state='back';$('report').hidden=true;sfx.tick();updateHint();return;
  }
- if(state==='swing1'){meter.power=meter.pos;state='swing2';sfx.lock();lockMark();updateHint();return;}
- if(state==='swing2'){hit(meter.power,meter.pos);return;}
+ if(state==='back'){
+  sw.power=meter.pos;const d=sw.power-sw.plannedP;
+  sw.scores[1]=Math.round(clamp(100-Math.abs(d)*260-Math.max(0,sw.power-1)*120,0,100));
+  sw.tt=0;state='tempo';sfx.lock();updateHint();return;
+ }
+ if(state==='tempo'){
+  sw.t=sw.tt/TEMPO_IDEAL;
+  sw.scores[2]=Math.round(clamp(100-Math.abs(sw.t-1)*150,0,100));
+  meter.pos=sw.power;state='low';sfx.tick();updateHint();return;
+ }
+ if(state==='low'){hit();return;}
  if(state==='holed'&&timer>.8){showHoleCard();return;}
 }
-function lockMark(){const m=$('mlock');m.hidden=false;m.style.left=mpct(meter.power)+'%';}
-function cancelSwing(){if(state==='swing1'||state==='swing2'){state='aim';$('mlock').hidden=true;meter.pos=0;drawMeter();updateHint();}}
+function cancelSwing(){if(state==='back'||state==='tempo'||state==='low'){state='aim';meter.pos=0;updateHint();}}
 const MLO=-.09,MHI=1.1;
-function mpct(v){return(v-MLO)/(MHI-MLO)*100;}
+const mc=$('mc'),mx=mc.getContext('2d');
+function sizeMeter(){const r=mc.getBoundingClientRect();if(!r.width)return;mc.width=Math.round(r.width*DPR);mc.height=Math.round(r.height*DPR);}
+const STEPS=['Address','Backswing','Tempo','Low point'];
+function stepIdx(){return state==='aim'?0:state==='back'?1:state==='tempo'?2:state==='low'?3:4;}
 function drawMeter(){
- $('mneedle').style.left=mpct(state==='swing1'||state==='swing2'?meter.pos:0)+'%';
+ if($('dock').hidden||!mc.width)return;
+ const w=mc.width/DPR,h=mc.height/DPR;
+ mx.setTransform(DPR,0,0,DPR,0,0);mx.clearRect(0,0,w,h);
+ const si=stepIdx(),pad=12,colW=(w-pad*2)/4;
+ const F='"Barlow Condensed","Arial Narrow",sans-serif';
+ mx.textBaseline='middle';
+ const showScores=si>0&&si<4?sw.scores:(sw.last?sw.last.scores:[null,null,null,null]);
+ for(let i=0;i<4;i++){
+  const x=pad+colW*i;const active=i===si;
+  mx.fillStyle=active?'#f6c51b':'rgba(163,187,169,.85)';
+  mx.font=`${active?700:600} 11px ${F}`;
+  try{mx.letterSpacing='1.2px';}catch(e){}
+  mx.textAlign='left';
+  const label=w<480?['ADDRESS','BACK','TEMPO','LOW PT'][i]:(i+1)+' '+STEPS[i].toUpperCase();
+  mx.fillText(label,x,12);
+  const v=showScores[i];
+  if(v!=null&&!active){const lw=mx.measureText(label).width;mx.font=`800 12px ${F}`;mx.fillStyle=v>=90?'#f6c51b':v>=70?'#f3f6ee':'#ff5b4f';mx.fillText(String(v),x+lw+6,12);}
+  if(active){mx.fillStyle='#f6c51b';mx.fillRect(x,20,Math.min(colW-10,mx.measureText(label).width),2);}
+ }
+ try{mx.letterSpacing='0px';}catch(e){}
+ const tx=pad,tw=w-pad*2,ty=31,th=18;
+ const X=v=>tx+(v-MLO)/(MHI-MLO)*tw;
+ const rr=(x,y,ww,hh,r)=>{mx.beginPath();if(mx.roundRect)mx.roundRect(x,y,ww,hh,r);else mx.rect(x,y,ww,hh);};
+ const small=(t,x,al)=>{mx.font=`700 10px ${F}`;mx.textAlign=al||'left';mx.fillStyle='rgba(163,187,169,.9)';mx.fillText(t,x,ty+th+9);};
+ const needle=x=>{mx.fillStyle='#f3f6ee';mx.strokeStyle='rgba(0,0,0,.5)';mx.lineWidth=1;mx.fillRect(x-1.5,ty-5,3,th+10);mx.strokeRect(x-1.5,ty-5,3,th+10);};
+ if(si===0||si===4){
+  // address level
+  const mid=tx+tw/2,half=tw/2;
+  mx.globalAlpha=si===4?.45:1;
+  rr(tx,ty,tw,th,9);mx.fillStyle='#0a1c12';mx.fill();
+  mx.fillStyle='rgba(246,197,27,.9)';rr(mid-half*.08,ty+2,half*.16,th-4,6);mx.fill();
+  mx.fillStyle='rgba(243,246,238,.55)';mx.fillRect(mid-.5,ty-3,1,th+6);
+  for(let k=1;k<4;k++){const o=half*k/4;mx.fillRect(mid-o-.5,ty+4,1,th-8);mx.fillRect(mid+o-.5,ty+4,1,th-8);}
+  const a=si===0?Math.sin(sw.aPh):(sw.last?sw.last.a:0);
+  const bx=mid+a*(half-11);
+  mx.beginPath();mx.arc(bx,ty+th/2,7,0,TAU);mx.fillStyle='rgba(243,246,238,.95)';mx.fill();mx.strokeStyle='rgba(0,0,0,.4)';mx.stroke();
+  small('CLOSED',tx);small('SQUARE',mid,'center');small('OPEN',tx+tw,'right');
+  mx.globalAlpha=1;
+ }else if(si===1||si===3){
+  const g=mx.createLinearGradient(tx,0,tx+tw,0);
+  g.addColorStop(0,'#2a5a3e');g.addColorStop(.6,'#3f7d4f');g.addColorStop((1-MLO)/(MHI-MLO),'#7aa84a');g.addColorStop((1-MLO)/(MHI-MLO)+.005,'#c4a33a');g.addColorStop(1,'#c4572f');
+  rr(tx,ty,tw,th,2);mx.fillStyle=g;mx.fill();
+  mx.fillStyle='rgba(243,246,238,.75)';mx.fillRect(X(1)-1,ty-4,2,th+8);
+  if(si===1){
+   const px=X(sw.plannedP);
+   mx.strokeStyle='#f3f6ee';mx.lineWidth=2;mx.setLineDash([3,3]);mx.beginPath();mx.moveTo(px,ty-6);mx.lineTo(px,ty+th+6);mx.stroke();mx.setLineDash([]);
+   small('PLAN',px,'center');if(Math.abs(X(1)-px)>34)small('FULL',X(1),'center');
+  }else{
+   mx.fillStyle='#f6c51b';mx.fillRect(X(-.03),ty-3,X(.03)-X(-.03),th+6);
+   mx.fillStyle='#f3f6ee';mx.fillRect(X(0)-1,ty-5,2,th+10);
+   mx.fillStyle='#ff5b4f';mx.fillRect(X(sw.power)-2,ty-6,4,th+12);
+   small('FAT',tx,'left');small('THIN',X(.03)+6,'left');
+  }
+  needle(X(meter.pos));
+ }else if(si===2){
+  rr(tx,ty,tw,th,2);mx.fillStyle='#0a1c12';mx.fill();
+  const T=x=>tx+clamp(x,0,2)/2*tw;
+  mx.fillStyle='rgba(246,197,27,.9)';mx.fillRect(T(.94),ty-3,T(1.06)-T(.94),th+6);
+  const f=sw.tt/TEMPO_IDEAL;
+  mx.fillStyle='rgba(243,246,238,.85)';mx.fillRect(tx,ty+4,T(f)-tx,th-8);
+  needle(T(f));
+  small('RUSHED',tx);small('SMOOTH',T(1),'center');small('LAZY',tx+tw,'right');
+ }
 }
-function initMeter(){
- const z=$('mzone');z.style.left=mpct(-.03)+'%';z.style.width=(mpct(.03)-mpct(-.03))+'%';
- $('mperfect').style.left=mpct(0)+'%';$('mfull').style.left=mpct(1)+'%';
+function showReport(r){
+ $('rpTot').textContent=r.overall;$('rpTot').className=grade(r.overall);
+ $('rpCells').innerHTML=STEPS.map((n,i)=>`<div class="rp-cell"><span class="lab">${n}</span><b class="${grade(r.scores[i])}">${r.scores[i]}</b><span class="v">${r.verdicts[i]}</span></div>`).join('');
+ const el=$('report');el.classList.remove('fade');el.hidden=false;
 }
 
-function hit(power,pos){
- const c=CLUBS[ci];
- let err=pos, perfect=false, duff=pos<=MLO+.001;
- if(power>1&&!duff) err+=(Math.random()-.5)*(power-1)*.7;
- if(Math.abs(err)<.012&&!duff){perfect=true;err=0;}
+function hit(){
+ const c=CLUBS[ci],P=!!c.putter;
+ const a=sw.a,power=sw.power,e=sw.t-1;
+ const duff=meter.pos<=MLO+.001;
+ let lo=meter.pos;
+ if(power>1&&!duff)lo+=(Math.random()-.5)*(power-1)*.5;
+ const pure=!duff&&Math.abs(lo)<.011;
+ const sL=duff?0:Math.round(clamp(100-Math.abs(lo)*900,0,100));
+ sw.scores[3]=sL;
+ const aEff=Math.abs(a)<.08?0:a, eEff=Math.abs(e)<.06?0:e;
+ const aK=P?.03:.045;
+ // verdicts
+ const deg=Math.abs(a*aK*180/Math.PI).toFixed(1);
+ const diff=power-sw.plannedP;
+ const vA=aEff===0?'Square':`${a>0?'Open':'Closed'} ${deg}°`;
+ let vB=Math.abs(diff)<.03?'On your number':`${Math.round(Math.abs(diff)*100)}% ${diff>0?'long':'short'}`;
+ if(power>1.005)vB='Overswing · '+vB;
+ const vT=eEff===0?'Smooth':e<0?(e<-.3?'Rushed':'Quick'):(e>.3?'Lazy':'Slow');
+ const vL=duff?'Chunked':pure?'Pure':lo<0?(lo<-.05?'Heavy':'Fat'):(lo>.05?'Bladed':'Thin');
+ const overall=Math.round(sw.scores.reduce((t,v)=>t+v,0)/4);
+ sw.last={scores:sw.scores.slice(),verdicts:[vA,vB,vT+(eEff&&!P?(e<0?' · hook':' · slice'):''),vL],overall,a};
+ if(G){G.swings=G.swings||[];G.swings.push(sw.last.scores.slice());}
+ showReport(sw.last);
  shotStart={x:ball.x,y:ball.y};shotLie=lie;shotClub=ci;
  strokes++;
- if(lie==='green'||c.putter&&lie==='fringe')putts++;
+ if(lie==='green'||P&&lie==='fringe')putts++;
  pinFtStart=hyp(hole.pin.x-ball.x,hole.pin.y-ball.y);
- ball.trail=[{x:ball.x,y:ball.y,z:0}];ball.b=0;ball.treeHit=-1;ball.lipped=false;
- $('mlock').hidden=true;
- if(c.putter){
+ Object.assign(ball,{trail:[{x:ball.x,y:ball.y,z:0}],b:0,lipped:false,t:0,rollBonus:1});ball.hitTrees=new Set();
+ if(P){
   const R=putterRange();
-  const v0=Math.sqrt(2*SURF.green.f*R*Math.min(power,1.1));
-  const a=aim+err*.11;
-  ball.vx=Math.cos(a)*v0;ball.vy=Math.sin(a)*v0;ball.vz=0;ball.z=0;ball.mode='roll';ball.ax=0;ball.ay=0;
+  let pw=Math.min(power,1.1);
+  if(!pure&&!duff)pw*=lo<0?1-Math.min(.5,-lo*4):1+Math.min(.25,lo*2.5);
+  if(duff)pw*=.5;
+  const v0=Math.sqrt(2*SURF.green.f*R*pw);
+  const ang=aim+aEff*aK+eEff*.04;
+  ball.vx=Math.cos(ang)*v0;ball.vy=Math.sin(ang)*v0;ball.vz=0;ball.z=0;ball.mode='roll';ball.ax=0;ball.ay=0;
   sfx.putt();
-  if(!perfect&&Math.abs(err)>.035)toast(err>0?'Pushed it right':'Pulled it left');
  }else{
-  let carry=c.c*power*lieMult(lie,ci)*(perfect?1.025:1);
+  let carry=c.c*power*lieMult(lie,ci)*(1-Math.abs(eEff)*.06);
+  let apexMul=1;
   if(duff)carry*=.42;
-  const T=1.15+carry/110, apex=Math.max(1.5,carry*c.l*(lie==='sand'?1.1:1));
+  else if(pure)carry*=1.025;
+  else if(lo<0){carry*=1-Math.min(.6,-lo*6);apexMul=1-Math.min(.3,-lo*4);}
+  else{carry*=1-Math.min(.35,lo*3);apexMul=1-Math.min(.65,lo*9);ball.rollBonus=1+Math.min(.8,lo*8);}
+  const T=1.15+carry/110, apex=Math.max(1.2,carry*c.l*(lie==='sand'?1.1:1)*apexMul);
   ball.g=8*apex/(T*T);ball.vz=4*apex/T;
-  const vh=carry/T, a=aim+err*.22;
-  ball.vx=Math.cos(a)*vh;ball.vy=Math.sin(a)*vh;
-  const ca=err*72*c.cv;
+  const vh=carry/T, ang=aim+aEff*aK;
+  ball.vx=Math.cos(ang)*vh;ball.vy=Math.sin(ang)*vh;
+  const ca=eEff*14*c.cv;
   ball.ax=-Math.sin(aim)*ca;ball.ay=Math.cos(aim)*ca;
   ball.mode='fly';ball.z=.01;
-  landEst={x:ball.x+Math.cos(a)*carry,y:ball.y+Math.sin(a)*carry};
-  sfx.whoosh();setTimeout(()=>sfx.hit(power,perfect),60);
+  landEst={x:ball.x+Math.cos(ang)*carry,y:ball.y+Math.sin(ang)*carry};
+  sfx.whoosh();setTimeout(()=>sfx.hit(power,pure),60);
   if(lie==='sand')burst(ball.x,ball.y,'sand',26);
-  if(duff)toast('Chunked it');
-  else if(perfect)toast('Perfect strike');
-  else if(Math.abs(err)>.03)toast(err>0?'Slice':'Hook');
-  else if(power>1.03)toast('Overswing');
  }
+ if(sw.scores.every(v=>v>=95))toast('Perfect swing');
  state='flight';acc=0;updateHint();
 }
 
@@ -663,13 +773,16 @@ const CUP_R=.17;
 function step(dt){
  const b=ball;
  const px=b.x,py=b.y;
+ b.t+=dt;
+ if(b.t>16){b.vx=b.vy=b.vz=0;b.z=0;b.mode='rest';onStop();return;}
  if(b.mode==='fly'){
   const hf=Math.min(1,b.z/6+.35);
   b.vx+=(hole.wind.x*WINDK*hf+b.ax)*dt;b.vy+=(hole.wind.y*WINDK*hf+b.ay)*dt;
   b.x+=b.vx*dt;b.y+=b.vy*dt;b.vz-=b.g*dt;b.z+=b.vz*dt;
   // trees
   for(let i=0;i<hole.trees.length;i++){const t=hole.trees[i];const dx=b.x-t.x,dy=b.y-t.y;if(Math.abs(dx)>t.r||Math.abs(dy)>t.r)continue;
-   if(dx*dx+dy*dy<(t.r*.82)**2&&b.z<t.h&&b.treeHit!==i){b.treeHit=i;const sp=hyp(b.vx,b.vy);const ang=Math.atan2(-b.vy,-b.vx)+(Math.random()-.5)*2.2;const ns=sp*(.12+Math.random()*.18);b.vx=Math.cos(ang)*ns;b.vy=Math.sin(ang)*ns;b.vz=Math.min(b.vz,0)*.3;b.ax=b.ay=0;sfx.tree();burst(b.x,b.y,'leaf',12,b.z);toast('Off the trees');break;}}
+   // each tree can be hit once per shot and at most three per shot, so overlapping canopies cannot trap the ball
+   if(dx*dx+dy*dy<(t.r*.82)**2&&b.z<t.h&&!b.hitTrees.has(i)&&b.hitTrees.size<3){b.hitTrees.add(i);const sp=hyp(b.vx,b.vy);const ang=Math.atan2(-b.vy,-b.vx)+(Math.random()-.5)*2.2;const ns=sp*(.12+Math.random()*.18);b.vx=Math.cos(ang)*ns;b.vy=Math.sin(ang)*ns;b.vz=Math.min(b.vz,0);b.ax=b.ay=0;sfx.tree();burst(b.x,b.y,'leaf',12,b.z);toast('Off the trees');break;}}
   // flagstick / cup in the air
   const dc=hyp(b.x-hole.pin.x,b.y-hole.pin.y);
   if(b.z<.35&&dc<CUP_R*1.6&&hyp(b.vx,b.vy)<14&&b.vz<0){holed(true);return;}
@@ -680,7 +793,7 @@ function step(dt){
    if(s==='oob'){penalty('oob');return;}
    const S=SURF[s];
    const c=CLUBS[shotClub];
-   const loftRet=b.b===0?(1.15-c.l*1.8)*S.h:.82*Math.max(S.h,.25)*1.6;
+   const loftRet=(b.b===0?(1.15-c.l*1.8)*S.h:.82*Math.max(S.h,.25)*1.6)*(b.b===0?b.rollBonus:1);
    b.vx*=Math.min(.95,loftRet);b.vy*=Math.min(.95,loftRet);
    b.vz=-b.vz*S.rest;b.ax=b.ay=0;
    if(b.b===0){sfx.land(s);if(s==='sand')burst(b.x,b.y,'sand',20);else burst(b.x,b.y,'turf',6);}
@@ -794,8 +907,11 @@ function newGrain(any){const g=hole.green;const a=Math.random()*TAU,r=Math.sqrt(
 
 /* ---------- update ---------- */
 function update(dt){
- if(state==='swing1'){meter.pos+=dt*meter.up;if(meter.pos>=MHI){meter.pos=MHI;meter.power=MHI;state='swing2';lockMark();updateHint();}drawMeter();}
- else if(state==='swing2'){meter.pos-=dt*meter.down;if(meter.pos<=MLO){meter.pos=MLO;hit(meter.power,MLO);}drawMeter();}
+ if(state==='aim')sw.aPh+=dt*TAU/addrPeriod();
+ else if(state==='back'){meter.pos+=dt*meter.up;if(meter.pos>=MHI){meter.pos=MHI;swingAction();}}
+ else if(state==='tempo'){sw.tt+=dt;if(sw.tt>=TEMPO_IDEAL*2)swingAction();}
+ else if(state==='low'){meter.pos-=dt*meter.down;if(meter.pos<=MLO){meter.pos=MLO;hit();}}
+ drawMeter();
  if(state==='flight'){acc+=dt;let n=0;while(acc>=STEP&&state==='flight'&&n<60){step(STEP);acc-=STEP;n++;}}
  if(state==='settle'){timer+=dt;if(timer>1.1)setupShot();}
  if(state==='holed'){timer+=dt;if(timer>2.6&&$('cardOv').hidden)showHoleCard();}
@@ -884,7 +1000,7 @@ function render(){
  ctx.fillStyle='#0f2016';ctx.beginPath();ctx.arc(H.pin.x,H.pin.y,Math.max(CUP_R,1.6/s),0,TAU);ctx.fill();
  ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=Math.max(.04,.8/s);ctx.stroke();
  // aim preview (under trees)
- if(state==='aim'||state==='swing1'||state==='swing2')drawAim();
+ if(state==='aim'||state==='back'||state==='tempo'||state==='low')drawAim();
  // trees
  for(const t of H.trees){ctx.fillStyle='rgba(6,22,12,.32)';ctx.beginPath();ctx.ellipse(t.x+t.r*.35,t.y+t.r*.42,t.r*1.02,t.r*.92,0,0,TAU);ctx.fill();}
  for(const t of H.trees){const tc=TREECOLS[Math.floor(t.tone*TREECOLS.length)];ctx.fillStyle=tc[0];ctx.beginPath();ctx.arc(t.x,t.y,t.r,0,TAU);ctx.fill();ctx.fillStyle=tc[1];ctx.beginPath();ctx.arc(t.x-t.r*.22,t.y-t.r*.24,t.r*.62,0,TAU);ctx.fill();}
@@ -909,7 +1025,8 @@ function drawAim(){
   ctx.lineWidth=Math.max(.06,1.2/s);
   for(let d=10/3;d<R;d+=10/3){const x=ball.x+Math.cos(aim)*d,y=ball.y+Math.sin(aim)*d,nx=-Math.sin(aim)*.35,ny=Math.cos(aim)*.35;ctx.beginPath();ctx.moveTo(x-nx,y-ny);ctx.lineTo(x+nx,y+ny);ctx.stroke();}
  }else{
-  const carry=c.c*lieMult(lie,ci);const rr=2+carry*.035;
+  const carry=c.c*lieMult(lie,ci);const rr=2+Math.min(plan,carry)*.035;
+  if(plan<carry-1){const F=landingPoint(true);ctx.strokeStyle='rgba(255,255,255,.4)';ctx.lineWidth=Math.max(.1,1.2/s);ctx.beginPath();ctx.moveTo(L.x,L.y);ctx.lineTo(F.x,F.y);ctx.stroke();ctx.beginPath();ctx.arc(F.x,F.y,Math.max(.4,3/s),0,TAU);ctx.stroke();}
   ctx.fillStyle='rgba(246,197,27,.18)';ctx.strokeStyle='#f6c51b';ctx.lineWidth=Math.max(.15,2/s);
   ctx.beginPath();ctx.arc(L.x,L.y,rr,0,TAU);ctx.fill();ctx.stroke();
   ctx.beginPath();ctx.arc(L.x,L.y,Math.max(.3,2.5/s),0,TAU);ctx.fillStyle='#f6c51b';ctx.fill();
@@ -919,7 +1036,7 @@ function drawAim(){
  const sp=w2s(L.x,L.y);
  ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);
  ctx.font='700 15px "Barlow Condensed","Arial Narrow",sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';
- const txt=c.putter?`${Math.round(putterRange()*3)} ft range`:`${Math.round(c.c*lieMult(lie,ci))} yd`;
+ const txt=c.putter?`${Math.round(Math.min(plan,maxDist())*3)} ft`:`${Math.round(Math.min(plan,maxDist()))} yd`;
  const tw=ctx.measureText(txt).width;const ox=sp[0]+14,oy=sp[1]-14;
  ctx.fillStyle='rgba(12,36,24,.85)';ctx.fillRect(ox-5,oy-11,tw+10,22);ctx.fillStyle='#f3f6ee';ctx.fillText(txt,ox,oy+1);
  ctx.restore();
@@ -1000,12 +1117,13 @@ function updateHUD(){
 function updateHint(){
  const T=isTouch;const h=$('hint');
  const k=x=>T?'':`<kbd>${x}</kbd> `;
- if(state==='aim')h.innerHTML=T?'Drag to aim · tap Swing to start':`Aim with the mouse · ${k('Click')}or ${k('Space')}to start the swing`;
- else if(state==='swing1')h.innerHTML=T?'Tap to set power':'Click again to set power';
- else if(state==='swing2')h.innerHTML=T?'Tap as the needle hits the yellow zone':'Click as the needle crosses the yellow zone';
+ if(state==='aim')h.innerHTML=T?'Drag to pick your target · tap Address when the bubble is centered':`Point at your target · ${k('Click')}or ${k('Space')}when the bubble is centered`;
+ else if(state==='back')h.innerHTML=T?'Tap on the dashed line to hit your planned distance':'Stop the needle on the dashed line for your planned distance';
+ else if(state==='tempo')h.innerHTML=T?'Pause at the top · tap when the bar reaches yellow':'Pause at the top · click when the bar reaches the yellow window';
+ else if(state==='low')h.innerHTML=T?'Tap as the needle hits the yellow zone':'Click as the needle crosses the yellow zone';
  else if(state==='holed')h.innerHTML=T?'Tap for the scorecard':'Click for the scorecard';
  else h.innerHTML='&nbsp;';
- $('swing').textContent=state==='swing1'?'Power':state==='swing2'?'Strike':'Swing';
+ $('swing').textContent=state==='back'?'Top':state==='tempo'?'Go':state==='low'?'Strike':'Address';
 }
 let toastT=null;
 function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),1900);}
@@ -1047,13 +1165,15 @@ function showRoundEnd(){
   if(DB.lastDaily!==k){DB.streak=DB.lastDaily===dayKey(y)?(DB.streak||0)+1:1;DB.lastDaily=k;}
  }
  DB.resume=null;save();
+ const SW=G.swings||[];const avg=i=>SW.length?Math.round(SW.reduce((t,v)=>t+v[i],0)/SW.length):0;
+ const swAvg=SW.length?`<div><span class="lab">Swing avg</span><b class="${grade(Math.round((avg(0)+avg(1)+avg(2)+avg(3))/4))}">${Math.round((avg(0)+avg(1)+avg(2)+avg(3))/4)}</b></div>`+STEPS.map((n,i)=>`<div><span class="lab">${n}</span><b class="${grade(avg(i))}">${avg(i)}</b></div>`).join(''):'';
  const emo=G.scores.map(s=>{const d=s.s-s.p;return s.s===1?'⛳':d<=-2?'🦅':d===-1?'🐦':d===0?'⬜':d===1?'🟧':'🟥';}).join('');
  const share=`Pocket Links · ${G.label}\n${tot} (${fmtPar(tp.t)})\n${emo}`;
  const p=$('cardPanel');
  p.innerHTML=`<h2><small>${G.label} · Final</small>Round complete ${newBest?'<span class="pill">New best</span>':''}</h2>
  <div class="sumline"><div><span class="lab">Score</span><span class="big ${tp.t<0?'under':''}">${tot}</span></div><div><span class="lab">To par</span><span class="big ${tp.t<0?'under':''}">${fmtPar(tp.t)}</span></div></div>
  ${cardTable(-1)}
- <div class="sumline"><div><span class="lab">Fairways</span><b>${fir}/${firN}</b></div><div><span class="lab">Greens in reg</span><b>${gir}/${n}</b></div><div><span class="lab">Putts</span><b>${putts}</b></div>${G.mode==='daily'?`<div><span class="lab">Daily streak</span><b>${DB.streak} day${DB.streak===1?'':'s'}</b></div>`:''}</div>
+ <div class="sumline"><div><span class="lab">Fairways</span><b>${fir}/${firN}</b></div><div><span class="lab">Greens in reg</span><b>${gir}/${n}</b></div><div><span class="lab">Putts</span><b>${putts}</b></div>${swAvg}${G.mode==='daily'?`<div><span class="lab">Daily streak</span><b>${DB.streak} day${DB.streak===1?'':'s'}</b></div>`:''}</div>
  <div class="rowbtns"><button class="btn primary" id="bAgain">Play a new course</button><button class="btn" id="bShare">Copy score</button><button class="btn" id="bMenu">Main menu</button><span class="copyok" id="copyOk"></span></div>`;
  $('cardOv').hidden=false;
  $('bAgain').onclick=()=>startRandom();
@@ -1093,7 +1213,8 @@ function setAimFromScreen(px,py){
  const [wx,wy]=s2w(px,py);
  if(hyp(wx-ball.x,wy-ball.y)*cam.s<8)return;
  aim=Math.atan2(wy-ball.y,wx-ball.x);
- const L=landingPoint();const sp=w2s(L.x,L.y);
+ const md=maxDist();plan=clamp(hyp(wx-ball.x,wy-ball.y),CLUBS[ci].putter?1:md*.12,md);planUser=true;
+ const L=landingPoint(true);const sp=w2s(L.x,L.y);
  if(!viewAll&&(sp[0]<30||sp[0]>W-30||sp[1]<VR.y+20||sp[1]>VR.y+VR.h-20))frameShot();
 }
 let touchAiming=false;
@@ -1156,7 +1277,6 @@ function loop(now){
  requestAnimationFrame(loop);
 }
 window.__golf={get state(){return state},get ball(){return ball},get hole(){return hole},swingAction,surfaceAt:(x,y)=>surfaceAt(x,y),hit:(p,e)=>hit(p,e),setAim:a=>{aim=a},get aim(){return aim},startDaily};
-initMeter();
 resize();
 showMenu();
 requestAnimationFrame(loop);
