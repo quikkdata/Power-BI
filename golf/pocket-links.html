@@ -313,8 +313,8 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 .rc-note{font-family:var(--display);font-weight:800;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--flag)}
 @media (prefers-reduced-motion:reduce){.rc-in{animation:none}.coinpill.bump,#coinPop.on{animation:none}}
 @media (max-width:620px){.cgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.coinpill{left:8px;top:calc(env(safe-area-inset-top,0px) + 66px)}#coinPop{left:8px;top:calc(env(safe-area-inset-top,0px) + 94px)}}
-#swingUI{position:fixed;left:50%;top:58%;transform:translate(-50%,-50%) scale(.96);width:min(680px,calc(100% - 32px));display:flex;flex-direction:column;gap:8px;opacity:0;visibility:hidden;transition:opacity .2s,transform .2s,visibility 0s .2s;z-index:3}
-#swingUI.on{opacity:1;visibility:visible;transform:translate(-50%,-50%);transition:opacity .2s,transform .2s}
+#swingUI{position:fixed;left:50%;bottom:0;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 12px);transform:translate(-50%,8px);width:min(760px,calc(100% - 32px));display:flex;flex-direction:column;gap:8px;opacity:0;visibility:hidden;transition:opacity .2s,transform .2s,visibility 0s .2s;z-index:3}
+#swingUI.on{opacity:1;visibility:visible;transform:translate(-50%,0);transition:opacity .2s,transform .2s}
 #swingUI #meter{height:84px;box-shadow:0 14px 40px rgba(0,0,0,.45);border:1px solid rgba(243,246,238,.14)}
 #swingUI #swing{font-size:1.5rem}
 #dock{transition:opacity .2s}
@@ -338,7 +338,7 @@ body.touch #lockBtn{display:block}
 .hc-slow{position:absolute;right:6px;top:22px;font-family:var(--display);font-weight:800;font-style:italic;font-size:.8rem;letter-spacing:.1em;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 #hitLab{position:absolute;left:0;right:0;bottom:0;text-align:center;font-family:var(--display);font-weight:800;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;padding:3px;background:rgba(10,28,18,.88);color:var(--chalk)}
 #hitLab.sweet{background:#ffd34d;color:#2a1c00}#hitLab.ok{color:#64c1ff}#hitLab.bad{color:#ff6d61}
-@media (max-width:620px){#swingUI{top:60%}#swingUI #meter{height:74px}#hitcam{left:8px;width:52vw;top:calc(env(safe-area-inset-top,0px) + 96px)}.shotstats b{font-size:1rem}.shotstats{padding:6px 7px}}
+@media (max-width:620px){#swingUI #meter{height:74px}#hitcam{left:8px;width:52vw;top:calc(env(safe-area-inset-top,0px) + 96px)}.shotstats b{font-size:1rem}.shotstats{padding:6px 7px}}
 @media (prefers-reduced-motion:reduce){.hc-top i{animation:none}}
 </style>
 
@@ -988,7 +988,7 @@ function sc(err,win){return Math.round(clamp(100-Math.abs(err)/win*25,1,100));}
 function uiSync(){
  const sw2=(state==='aim'&&locked)||state==='swing';
  const ui=$('swingUI');if(ui.classList.contains('on')!==sw2)ui.classList.toggle('on',sw2);
- const d=$('dock'),off=state!=='aim';if(d.classList.contains('off')!==off)d.classList.toggle('off',off);
+ const d=$('dock'),off=state!=='aim'||locked;if(d.classList.contains('off')!==off)d.classList.toggle('off',off);
  if(d.classList.contains('locked')!==locked)d.classList.toggle('locked',locked);
 }
 function grade(v){return v>=90?'g-top':v>=70?'g-ok':'g-bad';}
