@@ -208,7 +208,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
   #coach p{font-size:.86rem}
 }
 @keyframes blink{50%{opacity:.25}}
-#pixWrap{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 84px);width:min(480px,calc(100% - 340px));min-width:300px;aspect-ratio:4/3;transform:translate(-50%,8px);opacity:0;transition:opacity .18s,transform .18s;pointer-events:none;border:4px solid #0a1c12;box-shadow:0 0 0 2px #f6c51b,0 12px 30px rgba(0,0,0,.45);background:#74c2ee}
+#pixWrap{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 104px);width:min(480px,calc(100% - 340px));min-width:300px;aspect-ratio:4/3;transform:translate(-50%,8px);opacity:0;transition:opacity .18s,transform .18s;pointer-events:none;border:4px solid #0a1c12;box-shadow:0 0 0 2px #f6c51b,0 12px 30px rgba(0,0,0,.45);background:#74c2ee}
 #pixWrap.on{opacity:1;transform:translate(-50%,0)}
 #pix{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges}
 #impWrap{position:absolute;right:6px;top:6px;width:38%;aspect-ratio:48/40;border:3px solid #0a1c12;box-shadow:0 0 0 2px #f3f6ee;background:#14251b;opacity:0;transform:scale(.6);transform-origin:top right;transition:opacity .15s,transform .2s cubic-bezier(.2,1.6,.4,1)}
@@ -244,8 +244,8 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 @keyframes shine{from{background-position:100% 0}to{background-position:-160% 0}}
 @media (prefers-reduced-motion:reduce){.tile.pop,.tile.t-gold,.tile.t-gold.pop,.imp-top{animation:none}}
 @media (max-width:620px){
-  #pixWrap{left:8px;transform:translateY(8px);width:calc(100% - 122px);top:calc(env(safe-area-inset-top,0px) + 70px)}
-  #pixWrap.on{transform:none}
+  #pixWrap{left:50%;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 28px);width:min(360px,calc(100% - 40px));min-width:0;transform:translate(-50%,8px)}
+  #pixWrap.on{transform:translate(-50%,0)}
   #impWrap{width:40%}
   #impLab{font-size:.6rem}
   #scores{width:96px;right:8px;top:calc(env(safe-area-inset-top,0px) + 12px);gap:5px}
@@ -325,16 +325,17 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 #lockBtn:active{transform:translateY(2px);box-shadow:0 2px 0 #a88200}
 .ctrls{display:flex;flex-direction:column;gap:6px;flex:0 0 auto}
 .aimrow{display:flex;gap:6px;align-items:stretch}
-.ab{border:0;border-radius:4px;background:#e2662a;color:#fff;font-family:var(--display);font-weight:800;font-size:1.2rem;min-width:40px;padding:4px 10px;box-shadow:0 3px 0 #9c3f14}
+.ab{border:0;border-radius:6px;background:#e2662a;color:#fff;font-family:var(--display);font-weight:800;font-size:1.6rem;line-height:1;min-width:52px;min-height:46px;padding:4px 12px;box-shadow:0 3px 0 #9c3f14}
 .ab:active{transform:translateY(2px);box-shadow:0 1px 0 #9c3f14}
 .ablab{flex:1;display:flex;align-items:center;justify-content:center;background:rgba(12,36,24,.9);border-radius:4px;font-family:var(--display);font-weight:700;font-size:.95rem;letter-spacing:.08em;text-transform:uppercase;padding:0 14px}
 .clubsel{display:flex;gap:6px;align-items:stretch}
-.club2{display:flex;align-items:center;gap:8px;background:rgba(12,36,24,.9);border-radius:4px;padding:4px 10px 4px 6px;min-width:178px}
-#clubIcon{width:66px;height:45px;image-rendering:pixelated;image-rendering:crisp-edges;background:rgba(243,246,238,.06);border-radius:3px}
-.updn{display:flex;flex-direction:column;gap:4px}
-.updn .ab{flex:1;font-size:.85rem;padding:2px 10px}
+.club2{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:none;padding:0 6px;min-width:128px}
+.club2 .cbody #cName{font-size:1rem;text-shadow:0 1px 4px rgba(0,0,0,.7);white-space:nowrap}
+#cDist{display:none}
+#clubIcon{width:44px;height:30px;image-rendering:pixelated;image-rendering:crisp-edges}
+.clubsel .ab{font-size:1.15rem}
 #dock .dockrow{align-items:stretch}
-@media (max-width:620px){.club2{min-width:0;flex:1}#clubIcon{width:44px;height:30px}#lockBtn{min-width:92px;padding:0 14px;font-size:1.35rem}.dockrow .readout{display:none}.ctrls{flex:1}}
+@media (max-width:620px){.club2{min-width:0;flex:1}#clubIcon{width:36px;height:24px}.ab{min-width:46px;min-height:44px}#lockBtn{min-width:92px;padding:0 14px;font-size:1.35rem}.dockrow .readout{display:none}.ctrls{flex:1}}
 #dock.locked #lockBtn{display:none}
 .shotstats{display:flex;flex-direction:column;gap:3px;background:rgba(12,36,24,.9);border:1px solid rgba(243,246,238,.12);border-radius:6px;padding:6px 9px}
 .srow{display:grid;grid-template-columns:auto 1fr;column-gap:6px;align-items:baseline}
@@ -342,7 +343,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 .srow b{font-family:var(--display);font-weight:800;font-size:1.05rem;font-variant-numeric:tabular-nums;color:var(--chalk);text-align:right;grid-row:1}
 .srow em{grid-column:1 / -1;font-style:normal;font-family:var(--display);font-weight:700;font-size:.66rem;letter-spacing:.04em;text-align:right;color:var(--fog);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .srow em.bad{color:#ff6d61}.srow em.mid{color:#ffab52}.srow em.good{color:#66dd93}
-#hitcam{position:fixed;left:16px;top:calc(env(safe-area-inset-top,0px) + 84px);width:min(340px,40vw);aspect-ratio:96/66;border:4px solid #0a1c12;box-shadow:0 0 0 2px #f3f6ee,0 12px 30px rgba(0,0,0,.45);background:#7cc6ef;opacity:0;transform:translateX(-12px);transition:opacity .35s,transform .25s;pointer-events:none;z-index:3}
+#hitcam{position:fixed;left:16px;top:calc(env(safe-area-inset-top,0px) + 104px);width:min(340px,40vw);aspect-ratio:96/66;border:4px solid #0a1c12;box-shadow:0 0 0 2px #f3f6ee,0 12px 30px rgba(0,0,0,.45);background:#7cc6ef;opacity:0;transform:translateX(-12px);transition:opacity .35s,transform .25s;pointer-events:none;z-index:3}
 #hitcam.on{opacity:1;transform:none}
 #hitcam.on.fade{opacity:0}
 #hitc{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges}
@@ -352,7 +353,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 .hc-slow{position:absolute;right:6px;top:22px;font-family:var(--display);font-weight:800;font-style:italic;font-size:.8rem;letter-spacing:.1em;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 #hitLab{position:absolute;left:0;right:0;bottom:0;text-align:center;font-family:var(--display);font-weight:800;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;padding:3px;background:rgba(10,28,18,.88);color:var(--chalk)}
 #hitLab.sweet{background:#ffd34d;color:#2a1c00}#hitLab.ok{color:#64c1ff}#hitLab.bad{color:#ff6d61}
-@media (max-width:620px){#swingUI #meter{height:74px}#hitcam{left:8px;width:52vw;top:calc(env(safe-area-inset-top,0px) + 76px)}.srow b{font-size:.92rem}.shotstats{padding:5px 6px}}
+@media (max-width:620px){#swingUI #meter{height:74px}#hitcam{left:50%;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 28px);width:min(320px,calc(100% - 48px));transform:translate(-50%,10px)}#hitcam.on{transform:translate(-50%,0)}.srow b{font-size:.92rem}.shotstats{padding:5px 6px}}
 @media (prefers-reduced-motion:reduce){.hc-top i{animation:none}}
 #top{align-items:flex-start}
 .hud{display:flex;align-items:stretch;background:rgba(12,36,24,.9);border:1px solid rgba(243,246,238,.1);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.3);overflow:hidden}
@@ -369,6 +370,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 .pausebtn:hover{background:var(--pine-3)}
 .pmenu{display:flex;flex-direction:column;gap:8px}
 .pmenu .btn{text-align:left;display:flex;justify-content:space-between;align-items:center}
+.pmenu .seg{display:flex;align-items:center;gap:8px}.pmenu .seg .lab{flex:1}.pmenu .seg .btn{flex:1;justify-content:center;border:1px solid rgba(243,246,238,.18)}
 .pmenu .btn span{font-style:normal;font-weight:600;font-size:.85rem;color:var(--fog)}
 @media (max-width:620px){.hsec{padding:6px 11px 7px}.hbig{font-size:1.45rem}.hwind svg{width:24px;height:24px}.pausebtn{width:26px}}
 </style>
@@ -378,7 +380,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 <div id="top" hidden>
   <div class="hud">
     <div class="hsec hhole"><span class="lab" id="hnLab">Hole</span><b class="hbig"><span id="hNum">1</span><sup id="hPar">P4</sup></b><span class="hsub" id="hL2">Shot 1</span></div>
-    <div class="hsec hwind" title="Wind"><svg viewBox="0 0 30 30" id="windArrow" aria-hidden="true"><circle cx="15" cy="15" r="13.5" fill="none" stroke="rgba(243,246,238,.22)" stroke-width="1.5"/><path d="M6 15h15M16 9l6 6-6 6" fill="none" stroke="#f6c51b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b class="hbig" id="windTxt">8</b><span class="lab">mph</span></div></div>
+    <div class="hsec hwind" title="Wind"><svg viewBox="0 0 30 30" id="windArrow" aria-hidden="true"><circle cx="15" cy="15" r="13.5" fill="none" stroke="rgba(243,246,238,.22)" stroke-width="1.5"/><path d="M6 15h15M16 9l6 6-6 6" fill="none" stroke="#f6c51b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b class="hbig" id="windTxt">8</b><span class="lab" id="windU">km/h</span></div></div>
     <div class="hsec hdist"><span class="lab" id="hDistLab">To pin</span><b class="hbig" id="hDist">412</b><span class="hsub" id="hDistU">yards</span></div>
     <button class="pausebtn" id="bPause" aria-label="Pause menu" title="Pause (P)"><i></i><i></i></button>
   </div>
@@ -398,7 +400,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
   <div class="dockrow">
     <div class="ctrls">
       <div class="aimrow"><button class="ab" id="aimL" aria-label="Aim left">‹</button><span class="ablab">Aim</span><button class="ab" id="aimR" aria-label="Aim right">›</button></div>
-      <div class="clubsel"><div class="club2"><canvas id="clubIcon" width="44" height="30" aria-hidden="true"></canvas><div class="cbody"><div id="cName">Driver</div><div id="cDist" class="num">250 yd carry</div></div></div><div class="updn"><button class="ab" id="cPrev" aria-label="Longer club">▲</button><button class="ab" id="cNext" aria-label="Shorter club">▼</button></div></div>
+      <div class="clubsel"><button class="ab" id="cPrev" aria-label="Longer club">▲</button><div class="club2"><canvas id="clubIcon" width="44" height="30" aria-hidden="true"></canvas><div class="cbody"><div id="cName">Driver</div><div id="cDist" class="num"></div></div></div><button class="ab" id="cNext" aria-label="Shorter club">▼</button></div>
     </div>
     <div class="readout">
       <span id="rPin" hidden></span>
@@ -419,7 +421,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 <div id="hitcam" aria-hidden="true"><canvas id="hitc" width="96" height="66"></canvas><div class="hc-top"><span><i></i>BALL HIT CAM · <b id="hitClub">7 IRON</b></span><span id="hitRep">REPLAY 1/3</span></div><div class="hc-slow">SLOW MO</div><div id="hitLab"></div></div>
 
 <div id="pixWrap" aria-hidden="true"><canvas id="pix" width="128" height="96"></canvas><div id="impWrap"><canvas id="imp" width="48" height="40"></canvas><div class="imp-top">IMPACT CAM</div><div id="impLab"></div></div></div>
-<div id="scores" hidden aria-live="polite"><div class="lab sc-head" id="scHead">Swing</div><div id="scTiles"></div><div class="tile total" id="scTotal"><span class="lab">Score</span><b>··</b><span class="tier">&nbsp;</span></div><div class="shotstats" id="shotStats" hidden><div class="srow"><span class="lab">Carry</span><b id="stCarry">·</b><em id="stCarryD"></em></div><div class="srow"><span class="lab">Total</span><b id="stTotal">·</b><em id="stTotalD"></em></div></div></div>
+<div id="scores" hidden aria-live="polite"><div id="scTiles"></div><div class="tile total" id="scTotal"><span class="lab">Score</span><b>··</b><span class="tier">&nbsp;</span></div><div class="shotstats" id="shotStats" hidden><div class="srow"><span class="lab">Carry</span><b id="stCarry">·</b><em id="stCarryD"></em></div><div class="srow"><span class="lab">Total</span><b id="stTotal">·</b><em id="stTotalD"></em></div></div></div>
 
 <div id="coinPill" class="coinpill" hidden><i></i><b id="coinTxt">0</b></div><div id="coinPop"></div>
 
@@ -468,7 +470,7 @@ const MINUS='−';
 
 /* ---------- storage ---------- */
 const KEY='pocketlinks.v1';
-let DB={rounds:0,best:null,daily:{},aces:0,birdies:0,eagles:0,streak:0,lastDaily:null,resume:null,holes:0,bag:null,train:{}};
+let DB={units:'metric',rounds:0,best:null,daily:{},aces:0,birdies:0,eagles:0,streak:0,lastDaily:null,resume:null,holes:0,bag:null,train:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&typeof s==='object')DB=Object.assign(DB,s);}catch(e){}
 if(!DB.train||typeof DB.train!=='object')DB.train={};
 function save(){try{localStorage.setItem(KEY,JSON.stringify(DB));}catch(e){}}
@@ -984,7 +986,7 @@ function startHole(i){
  showPlay();
  frameHole();cam.x=cam.tx;cam.y=cam.ty;cam.s=cam.ts;
  $('iNum').textContent=i+1;
- $('iSub').textContent=`Par ${hole.par} · ${hole.yards} yards · Wind ${hole.wind.mph} mph`;
+ $('iSub').textContent=`Par ${hole.par} · ${fmtLen(hole.yards)} · Wind ${windStr(hole.wind.mph)}`;
  $('iKey').textContent=isTouch?'Tap to tee off':'Click or press Space to tee off';
  $('intro').hidden=false;$('intro').style.opacity=1;
  setupShot();
@@ -1167,7 +1169,7 @@ function shotReason(){
 function statsTick(){
  if(!SHOT.on)return;
  const live=SHOT.total===null?hyp(ball.x-SHOT.start.x,ball.y-SHOT.start.y):SHOT.total;
- const f=v=>SHOT.putt?fmtFt(v):Math.round(v)+' yd';
+ const f=v=>SHOT.putt?fmtFt(v):fmtLen(v);
  const delta=(val,ideal,el,done)=>{const e=$(el);if(!done||!ideal){e.textContent='';e.className='';return;}
   const pc=Math.round((val/ideal-1)*100),r=shotReason();
   if(Math.abs(pc)<=3){e.textContent='✓ on target';e.className='good';return;}
@@ -1240,7 +1242,7 @@ function hit(){
   else{const m=n;carry*=Math.max(.5,1-(m<1.5?.04*m:.06+.07*(m-1.5)));apexMul=Math.max(.2,1-m*.18);ball.rollBonus=1+Math.min(1,m*.25);vL=m<1.5?'Thin':'Very thin';}
   const deg=Math.abs(f*9/k).toFixed(1);
   const lat=Math.round(Math.abs(.5*(f*16*c.cv*(c.work||1)/k)*Math.pow(1.15+maxDist()*power/110,2)));
-  const vF=fEff===0?'Straight':Math.abs(f)<=w.f+w.dz?`${f<0?'Draw':'Fade'} · ${lat} yd`:`${f<0?'Hook':'Slice'} · ${lat} yd`;
+  const vF=fEff===0?'Straight':Math.abs(f)<=w.f+w.dz?`${f<0?'Draw':'Fade'} · ${fmtLen(lat)}`:`${f<0?'Hook':'Slice'} · ${fmtLen(lat)}`;
   const vT=eEff===0?'Smooth':e<0?(e<-.3?'Rushed':'Quick'):(e>.3?'Lazy':'Slow');
   verdicts=[vB,vT,vF,vL];
   // face: open starts it right and curves it right, closed the other way
@@ -1336,8 +1338,12 @@ function step(dt){
  }
  if(b.trail.length===0||hyp(b.x-b.trail[b.trail.length-1].x,b.y-b.trail[b.trail.length-1].y)>.6)b.trail.push({x:b.x,y:b.y,z:b.z});
 }
-function fmtFt(yd){const ft=yd*3;return ft<10?ft.toFixed(1).replace(/\.0$/,'')+' ft':Math.round(ft)+' ft';}
-function fmtDist(yd){return yd<15?fmtFt(yd):Math.round(yd)+' yd';}
+function MET(){return DB.units!=='imperial';}
+function fmtFt(yd){const v=MET()?yd*.9144:yd*3,u=MET()?' m':' ft';return v<10?v.toFixed(1).replace(/\.0$/,'')+u:Math.round(v)+u;}
+function fmtLen(yd){return MET()?Math.round(yd*.9144)+' m':Math.round(yd)+' yd';}
+function fmtDist(yd){return yd<15?fmtFt(yd):fmtLen(yd);}
+function windVal(mph){return MET()?Math.round(mph*1.609):mph;}
+function windStr(mph){return windVal(mph)+(MET()?' km/h':' mph');}
 
 function onStop(){
  endStats();
@@ -1349,7 +1355,7 @@ function onStop(){
  if(s==='green'&&strokes<=hole.par-2)holeStat.gir=true;
  const D=distPin();
  if(s==='green'){toast(shotMode==='putt'?`${fmtFt(D)} left`:`On the green · ${fmtFt(D)}`);}
- else if(shotMode!=='putt'||shotLie!=='green')toast(`${Math.round(moved)} yd · ${SURF[s].name}`);
+ else if(shotMode!=='putt'||shotLie!=='green')toast(`${fmtLen(moved)} · ${SURF[s].name}`);
  if(strokes>=hole.par+4){state='holed';timer=0;finishHole(hole.par+4,'Picked up');return;}
  state='settle';timer=0;updateHUD();
 }
@@ -1382,8 +1388,8 @@ function holed(fromAir){
  let extra='';
  const putt=shotMode==='putt'||shotLie==='green';
  if(strokes===1)extra='';
- else if(!putt)extra=pinFtStart>40?`Holed out from ${Math.round(pinFtStart)} yards`:shotMode==='bump'?'Bump and run, in the jar':'Chip in';
- else if(pinFtStart*3>=20)extra=`Drained it from ${Math.round(pinFtStart*3)} ft`;
+ else if(!putt)extra=pinFtStart>40?`Holed out from ${fmtLen(pinFtStart)}`:shotMode==='bump'?'Bump and run, in the jar':'Chip in';
+ else if(pinFtStart*3>=20)extra=`Drained it from ${fmtFt(pinFtStart)}`;
  state='holed';timer=0;
  finishHole(strokes,extra);
 }
@@ -1670,8 +1676,8 @@ function drawAim(){
  ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);
  ctx.font='700 15px "Barlow Condensed","Arial Narrow",sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';
  const d=Math.min(plan,maxDist());
- let txt=mode==='putt'?`${Math.round(d*3)} ft`:`${Math.round(d)} yd`;
- if(stop){const r=hyp(stop.x-L.x,stop.y-L.y);txt=`Land ${Math.round(d)} yd · roll ${r<3?fmtFt(r):Math.round(r)+' yd'}`;}
+ let txt=mode==='putt'?fmtFt(d):fmtLen(d);
+ if(stop){const r=hyp(stop.x-L.x,stop.y-L.y);txt=`Land ${fmtLen(d)} · roll ${r<3?fmtFt(r):fmtLen(r)}`;}
  const tw=ctx.measureText(txt).width;let ox=sp[0]+14,oy=sp[1]-14;if(ox+tw+10>W)ox=sp[0]-tw-20;
  ctx.fillStyle='rgba(12,36,24,.85)';ctx.fillRect(ox-5,oy-11,tw+10,22);ctx.fillStyle='#f3f6ee';ctx.fillText(txt,ox,oy+1);
  ctx.restore();
@@ -1733,7 +1739,7 @@ function drawPinMarker(){
  ctx.fillStyle='rgba(12,36,24,.85)';ctx.beginPath();ctx.arc(0,0,17,0,TAU);ctx.fill();
  ctx.rotate(a);ctx.fillStyle='#ff5b4f';ctx.beginPath();ctx.moveTo(22,0);ctx.lineTo(14,-6);ctx.lineTo(14,6);ctx.fill();
  ctx.rotate(-a);ctx.fillStyle='#f3f6ee';ctx.font='700 12px "Barlow Condensed","Arial Narrow",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
- ctx.fillText(Math.round(hyp(hole.pin.x-ball.x,hole.pin.y-ball.y)),0,1);
+ ctx.fillText(fmtLen(hyp(hole.pin.x-ball.x,hole.pin.y-ball.y)).replace(/ \D+$/,""),0,1);
  ctx.restore();
 }
 
@@ -2123,7 +2129,7 @@ const tierOf=v=>TIERS.find(t=>v>=t[0]);
 const SB={anims:[]};
 function scoreReset(g){
  const el=$('scores');el.classList.remove('old');el.hidden=false;
- $('scHead').textContent=g==='putt'?'Stroke':g==='chip'?'Chip':'Swing';
+
  SHOT.on=false;$('shotStats').hidden=true;
  $('scTiles').innerHTML=GAMES[g].map(n=>`<div class="tile"><span class="lab">${n}</span><b>··</b><span class="tier">&nbsp;</span></div>`).join('');
  const t=$('scTotal');t.className='tile total';t.querySelector('b').textContent='··';t.querySelector('.tier').innerHTML='&nbsp;';
@@ -2177,21 +2183,21 @@ function updateHUD(){
   else el.textContent=TR.prox.length?fmtDist(TR.prox.reduce((a,b)=>a+b,0)/TR.prox.length):'·';
  }else{
   $('hnLab').textContent='Hole';$('hNum').textContent=G.idx+1;$('hPar').textContent='P'+hole.par;
-  $('hL1').textContent=`Par ${hole.par} · ${hole.yards} yd`;
+  $('hL1').textContent=`Par ${hole.par} · ${fmtLen(hole.yards)}`;
   $('hL2').textContent=state==='holed'?`Holed in ${strokes}`:`Shot ${strokes+1}`;
   $('hTotLab').textContent='Total';
   const tp=toPar(G.scores);const el=$('hTot');el.textContent=fmtPar(tp.t);el.className=tp.t<0?'under':'';
  }
- $('windTxt').textContent=hole.wind.mph;
+ $('windTxt').textContent=windVal(hole.wind.mph);$('windU').textContent=MET()?'km/h':'mph';
  $('windArrow').style.transform=`rotate(${(hole.wind.a+cam.rot)*180/Math.PI}deg)`;
  const c=CLUBS[ci];
  $('cName').textContent=c.n;drawClubIcon(c);
  const md=Math.round(maxDist());
- $('cDist').textContent=mode==='putt'?`${Math.round(putterRange()*3)} ft range`:mode==='chip'?`Chip to ${md} yd · ${c.loft}°`:mode==='bump'?`Bump to ${md} yd`:`${md} yd carry`;
+ $('cDist').textContent=mode==='putt'?`${fmtFt(putterRange())} range`:mode==='chip'?`Chip to ${fmtLen(md)}`:mode==='bump'?`Bump to ${fmtLen(md)}`:`${fmtLen(md)} carry`;
  const D=distPin();
  const onG=lie==='green'||lie==='fringe';
- $('rPin').textContent=D<15?fmtFt(D):`${Math.round(D)} yd`;
- if(D<15){$('hDist').textContent=Math.round(D*3);$('hDistU').textContent='feet';}else{$('hDist').textContent=Math.round(D);$('hDistU').textContent='yards';}
+ $('rPin').textContent=fmtDist(D);
+ if(D<15){const v=MET()?D*.9144:D*3;$('hDist').textContent=v<10?v.toFixed(1).replace(/\.0$/,''):Math.round(v);$('hDistU').textContent=MET()?'meters':'feet';}else{$('hDist').textContent=MET()?Math.round(D*.9144):Math.round(D);$('hDistU').textContent=MET()?'meters':'yards';}
  const lm=lieMult(lie,c);
  $('rLie').textContent=SURF[lie].name+(lm<.99&&mode!=='putt'?` · ${MINUS}${Math.round((1-lm)*100)}%`:'');
  const bw=$('rBreakWrap');
@@ -2279,6 +2285,18 @@ function showRoundEnd(){
 function startDaily(){const k=dayKey();G=null;newRound('daily',hashStr('daily'+k),'Daily '+prettyDay(k));G.date=k;}
 function startRandom(){const s=(Math.random()*4294967295)>>>0;newRound('random',s,'Course #'+(s%9000+1000));}
 function startQuick(){const s=(Math.random()*4294967295)>>>0;newRound('quick',s,'Quick three',3);}
+function showSettings(){
+ const p=$('cardPanel');
+ const draw=()=>{p.innerHTML=`<h2><small>Pocket Links</small>Settings</h2><div class="pmenu">
+  <div class="seg" role="group" aria-label="Units"><span class="lab">Units</span><button class="btn${MET()?' primary':''}" id="sMet">Metric</button><button class="btn${MET()?'':' primary'}" id="sImp">Imperial</button></div>
+  <button class="btn" id="sSound">Sound <span>${muted?'Off':'On'}</span></button>
+  <button class="btn primary" id="sDone">Done</button></div>`;
+  $('sMet').onclick=()=>{DB.units='metric';save();draw();};
+  $('sImp').onclick=()=>{DB.units='imperial';save();draw();};
+  $('sSound').onclick=()=>{audio();setMute(!muted);draw();};
+  $('sDone').onclick=()=>{$('cardOv').hidden=true;showMenu();};};
+ draw();$('menu').hidden=true;$('cardOv').hidden=false;$('sDone').focus();
+}
 function showMenu(){
  tutEnd();
  state='menu';$('cardOv').hidden=true;$('top').hidden=true;$('coinPill').hidden=true;$('dock').hidden=true;$('intro').hidden=true;$('scores').hidden=true;
@@ -2291,9 +2309,11 @@ function showMenu(){
  html+=`<button class="mode" id="mTrain"><span class="mt">Training</span><span class="ms">Full swing, chipping and putting, with a tutorial</span></button>`;
  html+=`<button class="mode" id="mBag"><span class="mt">myNolan</span><span class="ms">Your bag · ${new Set(INV.cards.map(c=>c.id)).size} of ${CARDS.length} clubs collected</span></button>`;
  html+=`<button class="mode" id="mShop"><span class="mt">Pro shop</span><span class="ms">${INV.coins.toLocaleString()} coins · open packs for better clubs</span></button>`;
+ html+=`<button class="mode" id="mSet"><span class="mt">Settings</span><span class="ms">Units ${MET()?'metric (m, km/h)':'imperial (yd, mph)'} · Sound ${muted?'off':'on'}</span></button>`;
  $('modes').innerHTML=html;
  $('stats').innerHTML=`<div><span class="lab">Rounds</span><b>${DB.rounds||0}</b></div><div><span class="lab">Best nine</span><b>${DB.best===null?'·':fmtPar(DB.best)}</b></div><div><span class="lab">Birdies</span><b>${(DB.birdies||0)+(DB.eagles||0)}</b></div><div><span class="lab">Daily streak</span><b>${DB.streak||0}</b></div>`;
  $('mDaily').onclick=startDaily;$('mRandom').onclick=startRandom;$('mQuick').onclick=startQuick;
+ $('mSet').onclick=showSettings;
  $('mTrain').onclick=showTraining;$('mBag').onclick=()=>showBag();$('mShop').onclick=()=>showShop();
  const mr=$('mResume');if(mr)mr.onclick=()=>{const r=DB.resume;G={mode:r.mode,seed:r.seed,label:r.label,idx:r.idx,scores:r.scores,pars:r.pars,date:r.date,swings:[]};startHole(r.idx);};
  $('menu').hidden=false;
@@ -2309,9 +2329,9 @@ let bagSlot='long',bagSel=null,bagDone=null;
 const FIT_COST=25,lvlCost=l=>60+l*60;
 function cardDisplay(card){
  const cat=cardById(card.id),T=TYPES[cat.type],st=cardStats(card);
- if(T.slot==='long')return[['Distance',(T.c*st.d-200)/65,`${Math.round(T.c*st.d)} yd`],['Forgive',T.fg+st.f,''],['Launch',(T.l*st.la-.05)/.1,'']];
- if(T.slot==='irons')return[['7 iron',(162*st.d-150)/25,`${Math.round(162*st.d)} yd`],['Forgive',.58+st.f,''],['Shaping',(T.work-.3)/1.1,'']];
- if(T.slot==='irons')return[['7 iron',(162*st.d-150)/25,`${Math.round(162*st.d)} yd`],['Forgive',.58+st.f,''],['Launch',(.21*st.la-.17)/.08,'']];
+ if(T.slot==='long')return[['Distance',(T.c*st.d-200)/65,fmtLen(T.c*st.d)],['Forgive',T.fg+st.f,''],['Launch',(T.l*st.la-.05)/.1,'']];
+ if(T.slot==='irons')return[['7 iron',(162*st.d-150)/25,fmtLen(162*st.d)],['Forgive',.58+st.f,''],['Shaping',(T.work-.3)/1.1,'']];
+ if(T.slot==='irons')return[['7 iron',(162*st.d-150)/25,fmtLen(162*st.d)],['Forgive',.58+st.f,''],['Launch',(.21*st.la-.17)/.08,'']];
  if(T.slot==='wedges')return[['Spin',.55+st.spin*2.5,''],['Forgive',.62+st.f,''],['Sand',.5+st.sand*5,'']];
  return[['Square',(st.face-.7)/.9,''],['Pace feel',(st.back-.8)/.45,''],['Forgive',.5+(st.face-1)*.8,'']];
 }
@@ -2548,6 +2568,7 @@ function openPause(){
   ${t?'':'<button class="btn" id="pmCard">Scorecard</button>'}
   ${t?'<button class="btn" id="pmClubs">Change clubs</button><button class="btn" id="pmSpot">New practice spot</button>':''}
   <button class="btn" id="pmSound">Sound <span>${muted?'Off':'On'}</span></button>
+  <button class="btn" id="pmUnits">Units <span>${MET()?'Metric':'Imperial'}</span></button>
   <button class="btn" id="pmQuit">${t?'Exit training':'Main menu'}</button></div>`;
  $('cardOv').hidden=false;
  const close=()=>{paused=false;$('cardOv').hidden=true;};
@@ -2556,8 +2577,10 @@ function openPause(){
  if($('pmClubs'))$('pmClubs').onclick=()=>{paused=false;$('cardOv').hidden=true;$('bBag').onclick();};
  if($('pmSpot'))$('pmSpot').onclick=()=>{close();newSpot();};
  $('pmSound').onclick=()=>{audio();setMute(!muted);$('pmSound').querySelector('span').textContent=muted?'Off':'On';};
+ $('pmUnits').onclick=()=>{toggleUnits();$('pmUnits').querySelector('span').textContent=MET()?'Metric':'Imperial';};
  $('pmQuit').onclick=()=>{paused=false;showMenu();};
 }
+function toggleUnits(){DB.units=MET()?'imperial':'metric';save();if(hole&&state!=='menu')updateHUD();}
 $('bPause').onclick=()=>{audio();openPause();};
 $('bBag').onclick=()=>{if(!train()||state!=='aim'||tut.on)return;showBag(()=>{$('cardOv').hidden=true;buildBag();setupShot();});};
 $('bExit').onclick=()=>showMenu();
