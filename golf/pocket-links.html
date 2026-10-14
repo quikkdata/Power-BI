@@ -1926,7 +1926,7 @@ function hitHead(S){
  return{k:'iron',n:'7 IRON',loft:34,H:8};
 }
 // draws the head with its leading edge at (lx,ly)
-function drawHead(c,hd,lx,ly){
+function drawHead(c,hd,lx,ly,shaftA){
  // sized against the ball (radius 7): an iron face is taller than the ball, a wood much bigger
  const out=PAL.out,steel='#aeb7c0',steelD='#7d8790',lite='#e6ebef';
  const shape=(poly,fill)=>{pfillPoly(c,poly.map(p=>[p[0]-.8,p[1]-.8]),out);pfillPoly(c,poly.map(p=>[p[0]+.8,p[1]+.8]),out);pfillPoly(c,poly,fill);};
@@ -1955,27 +1955,26 @@ function drawHead(c,hd,lx,ly){
   shaftFrom=[lx-3,ly-6];lean=[.12,-1];
   pbrush(c,shaftFrom[0],shaftFrom[1],shaftFrom[0]-2,shaftFrom[1]-4,3,'#8f99a3');shaftFrom=[shaftFrom[0]-2,shaftFrom[1]-4];
  }
+ if(shaftA!==undefined)lean=[Math.sin(shaftA),-Math.cos(shaftA)];
  const L=70,n=Math.hypot(lean[0],lean[1]);
  pbrush(c,shaftFrom[0],shaftFrom[1],shaftFrom[0]+lean[0]/n*L,shaftFrom[1]+lean[1]/n*L,2,'#c3cbd3');
  pbrush(c,shaftFrom[0]+.7,shaftFrom[1],shaftFrom[0]+.7+lean[0]/n*L,shaftFrom[1]+lean[1]/n*L,1,'#eef2f5');
 }
 // the swing path through impact: a parabola with its low point before, at or after the ball
 function hitPath(S,hd,bx,by,br,gy){
- const xc=bx-br+1;
- let xLow,yLow,target;
- if(hd.k==='putter'){return{xc,y:()=>gy-.5};}
- if(hd.k==='wood'||hd.k==='hybrid'){
-  const teed=S.g==='full'&&lie==='tee';
-  xLow=xc+1;yLow=teed?by+br*.6:gy-.4;target=yLow-.3;
-  if(S.thin||S.topped){yLow-=S.topped?br*1.1:br*.5;target=yLow-.2;}
-  if(S.fat||S.chunk){xLow=xc-(S.chunk?12:6);yLow=gy+(S.chunk?3:1.5);target=by+br*.25;}
- }else if(S.chunk){xLow=xc-12;yLow=gy+3.5;target=by+br*.35;}
- else if(S.fat){xLow=xc-6;yLow=gy+2;target=by+br*.2;}
- else if(S.topped){xLow=xc+2;yLow=by-br*.35;target=yLow-.2;}
- else if(S.thin){xLow=xc+2;yLow=by+br*.15;target=yLow-.2;}
- else{xLow=xc+(hd.n==='WEDGE'?7:6);yLow=gy+1.6;target=by+br*.55;}
- const k=Math.max(.004,(yLow-target)/Math.max(1,(xc-xLow)*(xc-xLow)));
- return{xc,xLow,yLow,y:x=>yLow-k*(x-xLow)*(x-xLow)};
+ // seen from the side: the head comes in low from the left and moves along the ground into the ball
+ const xc=bx-br+1,x0=-26;
+ if(hd.k==='putter')return{xc,x0,y:()=>gy-.5};
+ let xLow,yLow,drop;
+ const sweep=hd.k==='wood'||hd.k==='hybrid',teed=S.g==='full'&&lie==='tee';
+ if(sweep){xLow=xc+2;yLow=teed?by+br*.6:gy-.4;drop=5;if(S.thin||S.topped)yLow-=S.topped?br*1.1:br*.5;if(S.fat||S.chunk){xLow=xc-(S.chunk?12:6);yLow=gy+(S.chunk?3:1.5);}}
+ else if(S.chunk){xLow=xc-12;yLow=gy+3.5;drop=13;}
+ else if(S.fat){xLow=xc-6;yLow=gy+2;drop=12;}
+ else if(S.topped){xLow=xc+3;yLow=by-br*.35;drop=9;}
+ else if(S.thin){xLow=xc+3;yLow=by+br*.15;drop=9;}
+ else{xLow=xc+(hd.n==='WEDGE'?7:6);yLow=gy+1.6;drop=hd.n==='WEDGE'?16:13;}
+ const k=drop/((x0-xLow)*(x0-xLow));
+ return{xc,x0,xLow,yLow,y:x=>yLow-k*(x-xLow)*(x-xLow)};
 }
 function drawHitCam(ti){
  const S=HC.S,c=hc,gy=46,br=7,bx=52;
@@ -1989,7 +1988,7 @@ function drawHitCam(ti){
  const P=hitPath(S,hd,bx,by,br,gy);
  const tc=.48,end=HC.loop;
  // club x over time: slows into the ball like a slow motion camera, then carries on
- const x0=-16;
+ const x0=P.x0;
  let lx=ti<tc?x0+(P.xc-x0)*(1-Math.pow(1-ti/tc,1.6)):P.xc+(ti-tc)*(S.chunk?6:S.fat?12:hd.k==='putter'?10:30);
  let ly=P.y(lx);
  if(hd.k!=='putter'&&ly>gy+3.5)ly=gy+3.5;
@@ -2021,8 +2020,14 @@ function drawHitCam(ti){
  if(sq){c.fillStyle=PAL.out;for(let y=-8;y<=8;y++)for(let x=-6;x<=6;x++)if((x*x)/34+(y*y)/66<=1)c.fillRect(ballX+x,Math.round(ballY)+y,1,1);c.fillStyle='#ffffff';for(let y=-7;y<=7;y++)for(let x=-5;x<=5;x++)if((x*x)/24+(y*y)/50<=1)c.fillRect(ballX+x,Math.round(ballY)+y,1,1);}
  else{pdisc(c,ballX,ballY,br+.8,PAL.out);pdisc(c,ballX,ballY,br,'#ffffff');pdisc(c,ballX+2,ballY+2,3,PAL.ballD);
   c.fillStyle=PAL.ballD;for(let i=0;i<6;i++){const a=i/6*TAU+rot;c.fillRect(Math.round(ballX+Math.cos(a)*4),Math.round(ballY+Math.sin(a)*4),1,1);}}
- // club head on top of the ball until it has passed
- drawHead(c,hd,lx,ly);
+ // shaft lags behind the head on the way in and leans toward the target through impact
+ const lag=hd.k==='putter'?-.08:-.55,through=hd.k==='iron'?.3:hd.k==='putter'?.1:.08;
+ const pr=clamp((lx-x0)/(P.xc-x0),0,1.6),shaftA=pr<1?lag+(through-lag)*pr*pr:through+(pr-1)*.9;
+ // motion blur: faint copies of the head behind it, longest just before impact
+ const blur=ti<tc?3:1.5;
+ for(let i=3;i>0;i--){c.globalAlpha=.1*(4-i);drawHead(c,hd,lx-i*blur,P.y(lx-i*blur),shaftA-.03*i);}
+ c.globalAlpha=1;
+ drawHead(c,hd,lx,ly,shaftA);
  if(contact&&ti-tc<.12){const r=3+(ti-tc)*70;pring(c,bx-br,by+br*.3,r,S.last>=100?'#ffd34d':S.last>=85?'#ffffff':'rgba(255,255,255,.5)');
   if(S.last>=85)for(let i=0;i<10;i++){const a=i/10*TAU;c.fillStyle=S.last>=100?'#ffd34d':'#ffffff';c.fillRect(Math.round(bx-br+Math.cos(a)*r*1.3),Math.round(by+br*.3+Math.sin(a)*r*1.3),1,1);}}
 }
