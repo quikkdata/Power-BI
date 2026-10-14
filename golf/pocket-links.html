@@ -253,7 +253,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
   .tile{padding:4px 7px 5px}.tile b{font-size:1.65rem}.tile .lab{font-size:.54rem;letter-spacing:.06em}.tile .tier{font-size:.54rem;letter-spacing:.08em}
   .tile.total b{font-size:2.1rem}
 }
-.coinpill{position:fixed;left:16px;top:calc(env(safe-area-inset-top,0px) + 70px);display:flex;align-items:center;gap:6px;background:rgba(12,36,24,.88);border:1px solid rgba(255,211,77,.35);border-radius:999px;padding:3px 10px 3px 4px;font-family:var(--display);font-weight:800;font-size:1rem;color:#ffd34d;pointer-events:none}
+.coinpill{position:fixed;left:16px;top:calc(env(safe-area-inset-top,0px) + 82px);display:flex;align-items:center;gap:6px;background:rgba(12,36,24,.88);border:1px solid rgba(255,211,77,.35);border-radius:999px;padding:3px 10px 3px 4px;font-family:var(--display);font-weight:800;font-size:1rem;color:#ffd34d;pointer-events:none}
 .coinpill i,.coinbig i,.pk-p i{display:inline-block;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff3b0,#f2c230 45%,#a87400);box-shadow:inset 0 0 0 2px rgba(120,80,0,.5)}
 .coinpill.bump{animation:pop .45s cubic-bezier(.2,1.7,.4,1)}
 #coinPop{position:fixed;left:16px;top:calc(env(safe-area-inset-top,0px) + 100px);font-family:var(--display);font-weight:800;font-size:.95rem;color:#ffd34d;text-shadow:0 2px 6px rgba(0,0,0,.7);opacity:0;pointer-events:none}
@@ -312,7 +312,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 .rc-sub{font-family:var(--display);font-weight:700;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fog)}
 .rc-note{font-family:var(--display);font-weight:800;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--flag)}
 @media (prefers-reduced-motion:reduce){.rc-in{animation:none}.coinpill.bump,#coinPop.on{animation:none}}
-@media (max-width:620px){.cgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.coinpill{left:8px;top:calc(env(safe-area-inset-top,0px) + 66px)}#coinPop{left:8px;top:calc(env(safe-area-inset-top,0px) + 94px)}}
+@media (max-width:620px){.cgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.coinpill{left:8px;top:calc(env(safe-area-inset-top,0px) + 76px)}#coinPop{left:8px;top:calc(env(safe-area-inset-top,0px) + 104px)}}
 #swingUI{position:fixed;left:50%;bottom:0;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 12px);transform:translate(-50%,8px);width:min(760px,calc(100% - 32px));display:flex;flex-direction:column;gap:8px;opacity:0;visibility:hidden;transition:opacity .2s,transform .2s,visibility 0s .2s;z-index:3}
 #swingUI.on{opacity:1;visibility:visible;transform:translate(-50%,0);transition:opacity .2s,transform .2s}
 #swingUI #meter{height:84px;box-shadow:0 14px 40px rgba(0,0,0,.45);border:1px solid rgba(243,246,238,.14)}
@@ -340,7 +340,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 .shotstats div{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .shotstats .lab{font-size:.6rem}
 .shotstats b{font-family:var(--display);font-weight:800;font-size:1.25rem;font-variant-numeric:tabular-nums;color:var(--chalk)}
-#hitcam{position:fixed;left:16px;top:calc(env(safe-area-inset-top,0px) + 102px);width:min(340px,40vw);aspect-ratio:96/66;border:4px solid #0a1c12;box-shadow:0 0 0 2px #f3f6ee,0 12px 30px rgba(0,0,0,.45);background:#7cc6ef;opacity:0;transform:translateX(-12px);transition:opacity .35s,transform .25s;pointer-events:none;z-index:3}
+#hitcam{position:fixed;left:16px;top:calc(env(safe-area-inset-top,0px) + 114px);width:min(340px,40vw);aspect-ratio:96/66;border:4px solid #0a1c12;box-shadow:0 0 0 2px #f3f6ee,0 12px 30px rgba(0,0,0,.45);background:#7cc6ef;opacity:0;transform:translateX(-12px);transition:opacity .35s,transform .25s;pointer-events:none;z-index:3}
 #hitcam.on{opacity:1;transform:none}
 #hitcam.on.fade{opacity:0}
 #hitc{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges}
@@ -350,20 +350,37 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 .hc-slow{position:absolute;right:6px;top:22px;font-family:var(--display);font-weight:800;font-style:italic;font-size:.8rem;letter-spacing:.1em;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 #hitLab{position:absolute;left:0;right:0;bottom:0;text-align:center;font-family:var(--display);font-weight:800;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;padding:3px;background:rgba(10,28,18,.88);color:var(--chalk)}
 #hitLab.sweet{background:#ffd34d;color:#2a1c00}#hitLab.ok{color:#64c1ff}#hitLab.bad{color:#ff6d61}
-@media (max-width:620px){#swingUI #meter{height:74px}#hitcam{left:8px;width:52vw;top:calc(env(safe-area-inset-top,0px) + 96px)}.shotstats b{font-size:1rem}.shotstats{padding:6px 7px}}
+@media (max-width:620px){#swingUI #meter{height:74px}#hitcam{left:8px;width:52vw;top:calc(env(safe-area-inset-top,0px) + 106px)}.shotstats b{font-size:1rem}.shotstats{padding:6px 7px}}
 @media (prefers-reduced-motion:reduce){.hc-top i{animation:none}}
+#top{align-items:flex-start}
+.hud{display:flex;align-items:stretch;background:rgba(12,36,24,.9);border:1px solid rgba(243,246,238,.1);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.3);overflow:hidden}
+.hsec{display:flex;flex-direction:column;justify-content:center;padding:7px 16px 8px;min-width:0}
+.hsec+.hsec{border-left:1px solid rgba(243,246,238,.1)}
+.hbig{font-family:var(--display);font-weight:800;font-size:1.75rem;line-height:1;font-variant-numeric:tabular-nums;color:var(--chalk)}
+.hhole .hbig sup{font-size:.48em;font-weight:700;color:var(--flag);margin-left:3px;vertical-align:super;letter-spacing:.02em}
+.hsub{font-size:.72rem;color:var(--fog);margin-top:2px;white-space:nowrap}
+.hwind{flex-direction:row;align-items:center;gap:8px}
+.hwind svg{width:30px;height:30px;transition:transform .4s}
+.hwind div{display:flex;flex-direction:column}
+.pausebtn{width:46px;height:46px;border:1px solid rgba(243,246,238,.1);border-radius:8px;background:rgba(12,36,24,.9);display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.pausebtn i{display:block;width:5px;height:18px;border-radius:2px;background:var(--chalk)}
+.pausebtn:hover{background:var(--pine-3)}
+.pmenu{display:flex;flex-direction:column;gap:8px}
+.pmenu .btn{text-align:left;display:flex;justify-content:space-between;align-items:center}
+.pmenu .btn span{font-style:normal;font-weight:600;font-size:.85rem;color:var(--fog)}
+@media (max-width:620px){.hsec{padding:6px 11px 7px}.hbig{font-size:1.45rem}.hwind svg{width:24px;height:24px}.pausebtn{width:42px;height:42px}}
 </style>
 
 <canvas id="c" aria-label="Golf course"></canvas>
 
 <div id="top" hidden>
-  <div class="chyron">
-    <div class="hn"><small id="hnLab">HOLE</small><b id="hNum">1</b></div>
-    <div class="meta"><div class="l1" id="hL1">Par 4 · 412 yd</div><div class="l2" id="hL2">Stroke 1</div></div>
-    <div class="tp"><span class="lab" id="hTotLab">Total</span><b id="hTot">E</b></div>
+  <div class="hud">
+    <div class="hsec hhole"><span class="lab" id="hnLab">Hole</span><b class="hbig"><span id="hNum">1</span><sup id="hPar">P4</sup></b><span class="hsub" id="hL2">Shot 1</span></div>
+    <div class="hsec hwind" title="Wind"><svg viewBox="0 0 30 30" id="windArrow" aria-hidden="true"><circle cx="15" cy="15" r="13.5" fill="none" stroke="rgba(243,246,238,.22)" stroke-width="1.5"/><path d="M6 15h15M16 9l6 6-6 6" fill="none" stroke="#f6c51b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b class="hbig" id="windTxt">8</b><span class="lab">mph</span></div></div>
+    <div class="hsec hdist"><span class="lab" id="hDistLab">To pin</span><b class="hbig" id="hDist">412</b><span class="hsub" id="hDistU">yards</span></div>
   </div>
-  <div class="tright">
-    <div class="wind" title="Wind"><svg viewBox="0 0 30 30" id="windArrow" aria-hidden="true"><circle cx="15" cy="15" r="13.5" fill="none" stroke="rgba(243,246,238,.25)" stroke-width="1.5"/><path d="M6 15h15M16 9l6 6-6 6" fill="none" stroke="#f6c51b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div><div class="lab">Wind</div><b class="num" id="windTxt">8 mph</b></div></div>
+  <button class="pausebtn" id="bPause" aria-label="Pause menu" title="Pause (P)"><i></i><i></i></button>
+  <div id="legacyBtns" hidden><span id="hL1"></span><span id="hTotLab"></span><span id="hTot"></span>
     <button class="tbtn" id="bMap" aria-pressed="false" title="Hole overview (V)"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M1.5 4l5-2 5 2 5-2v12l-5 2-5-2-5 2z M6.5 2v12 M11.5 4v12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><span>Map</span></button>
     <button class="tbtn" id="bCard" title="Scorecard (C)"><svg viewBox="0 0 18 18" aria-hidden="true"><rect x="1.5" y="3" width="15" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M1.5 7.5h15M6 3v12M11 3v12" stroke="currentColor" stroke-width="1.5"/></svg><span>Card</span></button>
     <button class="tbtn" id="bSpot" title="New practice spot (N)" hidden><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 16s5-4.6 5-8.5A5 5 0 0 0 4 7.5C4 11.4 9 16 9 16z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="9" cy="7.5" r="1.8" fill="currentColor"/></svg><span>New spot</span></button>
@@ -382,7 +399,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
       <div class="clubsel"><div class="club2"><canvas id="clubIcon" width="44" height="30" aria-hidden="true"></canvas><div class="cbody"><div id="cName">Driver</div><div id="cDist" class="num">250 yd carry</div></div></div><div class="updn"><button class="ab" id="cPrev" aria-label="Longer club">▲</button><button class="ab" id="cNext" aria-label="Shorter club">▼</button></div></div>
     </div>
     <div class="readout">
-      <div><span class="lab" id="rPinLab">To pin</span><b id="rPin" class="num">412 yd</b></div>
+      <span id="rPin" hidden></span>
       <div><span class="lab">Lie</span><b id="rLie">Tee box</b></div>
       <div id="rBreakWrap" hidden><span class="lab">Break</span><b id="rBreak">Slight</b></div>
     </div>
@@ -2131,21 +2148,21 @@ function setShape(v){if(state!=='aim'||mode!=='full')return;const d=Math.min(pla
 function updateHUD(){
  if(!G||!hole)return;
  if(train()){
-  $('hnLab').textContent='SHOTS';$('hNum').textContent=TR.n;
+  $('hnLab').textContent='Training';$('hNum').textContent=TR.n;$('hPar').textContent='';
+  $('hL2').textContent=TR.n?`Avg ${Math.round(TR.sum/TR.n)} · best ${TR.best}`:DRILL_NAME[G.drill];
   $('hL1').textContent='Training · '+DRILL_NAME[G.drill];
-  $('hL2').textContent=TR.n?`Avg score ${Math.round(TR.sum/TR.n)} · best ${TR.best}`:'The ball comes back here after every shot';
   $('hTotLab').textContent=G.drill==='putt'?'Holed':'Avg left';
   const el=$('hTot');el.className='';
   if(G.drill==='putt')el.textContent=TR.n?`${TR.holed}/${TR.n}`:'0';
   else el.textContent=TR.prox.length?fmtDist(TR.prox.reduce((a,b)=>a+b,0)/TR.prox.length):'·';
  }else{
-  $('hnLab').textContent='HOLE';$('hNum').textContent=G.idx+1;
+  $('hnLab').textContent='Hole';$('hNum').textContent=G.idx+1;$('hPar').textContent='P'+hole.par;
   $('hL1').textContent=`Par ${hole.par} · ${hole.yards} yd`;
-  $('hL2').textContent=state==='holed'?`Holed in ${strokes}`:`Stroke ${strokes+1}`;
+  $('hL2').textContent=state==='holed'?`Holed in ${strokes}`:`Shot ${strokes+1}`;
   $('hTotLab').textContent='Total';
   const tp=toPar(G.scores);const el=$('hTot');el.textContent=fmtPar(tp.t);el.className=tp.t<0?'under':'';
  }
- $('windTxt').textContent=`${hole.wind.mph} mph`;
+ $('windTxt').textContent=hole.wind.mph;
  $('windArrow').style.transform=`rotate(${(hole.wind.a+cam.rot)*180/Math.PI}deg)`;
  const c=CLUBS[ci];
  $('cName').textContent=c.n;drawClubIcon(c);
@@ -2154,6 +2171,7 @@ function updateHUD(){
  const D=distPin();
  const onG=lie==='green'||lie==='fringe';
  $('rPin').textContent=D<15?fmtFt(D):`${Math.round(D)} yd`;
+ if(D<15){$('hDist').textContent=Math.round(D*3);$('hDistU').textContent='feet';}else{$('hDist').textContent=Math.round(D);$('hDistU').textContent='yards';}
  const lm=lieMult(lie,c);
  $('rLie').textContent=SURF[lie].name+(lm<.99&&mode!=='putt'?` · ${MINUS}${Math.round((1-lm)*100)}%`:'');
  const bw=$('rBreakWrap');
@@ -2163,8 +2181,8 @@ function updateHUD(){
 }
 const HINTS={
  full:[['Stop the needle on the dashed line','Tap on the dashed line'],['Pause at the top · click when the bar reaches the yellow window','Tap when the bar reaches yellow'],['Yellow is straight · blue draws or fades it · red hooks or slices','Yellow straight · blue shapes · red curves away'],['Click in the yellow zone · right is thin, left is fat','Tap in the yellow zone']],
- chip:[['Pick your landing spot · click when the shaft leans into the yellow','Drag to your landing spot · tap when the shaft is in the yellow'],['Stop on the dashed line · the needle speeds up','Tap on the dashed line, it speeds up'],['Click in the tiny yellow zone for a crisp strike','Tap in the tiny yellow zone']],
- putt:[['Point where the ball should start · click when the face is square','Drag to aim · tap when the face is square'],['Stop the putter on the dashed line','Tap on the dashed line'],['Click as the putter reaches the ball','Tap as the putter reaches the ball']]
+ chip:[['Click when the shaft leans into the yellow','Tap when the shaft is in the yellow'],['Stop on the dashed line · the needle speeds up','Tap on the dashed line, it speeds up'],['Click in the tiny yellow zone for a crisp strike','Tap in the tiny yellow zone']],
+ putt:[['Click when the face is square','Tap when the face is square'],['Stop the putter on the dashed line','Tap on the dashed line'],['Click as the putter reaches the ball','Tap as the putter reaches the ball']]
 };
 const BTN={full:['Top','Go','Square','Strike'],chip:['Hands','Length','Strike'],putt:['Face','Length','Stroke']};
 function updateHint(){
@@ -2499,6 +2517,28 @@ function toggleMap(){viewAll=!viewAll;$('bMap').setAttribute('aria-pressed',Stri
 $('bMap').onclick=toggleMap;
 $('bCard').onclick=()=>{if(G&&!train()&&state!=='menu'&&state!=='done'){if($('cardOv').hidden)showHoleCard(!G.scores[G.idx]);else $('cardOv').hidden=true;}};
 $('bSpot').onclick=newSpot;
+let paused=false;
+function openPause(){
+ if(!G||state==='menu'||state==='done'||state==='swing'||state==='anim'||!$('cardOv').hidden)return;
+ paused=true;
+ const p=$('cardPanel'),t=train(),tp=toPar(G.scores||[]);
+ const head=t?`Training · ${DRILL_NAME[G.drill]}`:`${G.label} · Thru ${tp.n} · ${fmtPar(tp.t)}`;
+ p.innerHTML=`<h2><small>${head}</small>Paused</h2><div class="pmenu">
+  <button class="btn primary" id="pmResume">Resume</button>
+  ${t?'':'<button class="btn" id="pmCard">Scorecard</button>'}
+  ${t?'<button class="btn" id="pmClubs">Change clubs</button><button class="btn" id="pmSpot">New practice spot</button>':''}
+  <button class="btn" id="pmSound">Sound <span>${muted?'Off':'On'}</span></button>
+  <button class="btn" id="pmQuit">${t?'Exit training':'Main menu'}</button></div>`;
+ $('cardOv').hidden=false;
+ const close=()=>{paused=false;$('cardOv').hidden=true;};
+ $('pmResume').onclick=close;$('pmResume').focus();
+ if($('pmCard'))$('pmCard').onclick=()=>{paused=false;showHoleCard(!G.scores[G.idx]);};
+ if($('pmClubs'))$('pmClubs').onclick=()=>{paused=false;$('cardOv').hidden=true;$('bBag').onclick();};
+ if($('pmSpot'))$('pmSpot').onclick=()=>{close();newSpot();};
+ $('pmSound').onclick=()=>{audio();setMute(!muted);$('pmSound').querySelector('span').textContent=muted?'Off':'On';};
+ $('pmQuit').onclick=()=>{paused=false;showMenu();};
+}
+$('bPause').onclick=()=>{audio();openPause();};
 $('bBag').onclick=()=>{if(!train()||state!=='aim'||tut.on)return;showBag(()=>{$('cardOv').hidden=true;buildBag();setupShot();});};
 $('bExit').onclick=()=>showMenu();
 function setMute(m){muted=m;DB.muted=m;save();$('bSound').setAttribute('aria-pressed',String(!m));$('sndWaves').style.opacity=m?0:1;}
@@ -2519,6 +2559,7 @@ addEventListener('keydown',e=>{
  else if(k==='v'||k==='V')toggleMap();
  else if(k==='c'||k==='C'||k==='Tab'){e.preventDefault();$('bCard').onclick();}
  else if(k==='m'||k==='M')setMute(!muted);
+ else if(k==='p'||k==='P')openPause();
  else if(k==='Escape'){if(state==='aim')unlockTarget();else cancelSwing();}
 });
 addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='a')holdL=0;if(e.key==='ArrowRight'||e.key==='d')holdR=0;});
@@ -2531,6 +2572,8 @@ function loop(now){
   aim+=(mode==='putt'?.25:.5)*(holdR-holdL)*dt;
   if(!viewAll){const L=landingPoint();const sp=w2s(L.x,L.y);if(sp[0]<30||sp[0]>W-30||sp[1]<VR.y+20||sp[1]>VR.y+VR.h-20)frameShot();}
  }
+ if(paused&&!$('cardOv').hidden){render();requestAnimationFrame(loop);return;}
+ paused=false;
  update(dt);render();
  requestAnimationFrame(loop);
 }
