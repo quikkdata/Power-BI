@@ -220,7 +220,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 #impLab.sweet{color:#2a1c00;background:#ffd34d}
 #impLab.ok{color:#64c1ff}
 #impLab.bad{color:#ff6d61}
-#scores{position:fixed;right:16px;top:calc(env(safe-area-inset-top,0px) + 84px);width:142px;display:flex;flex-direction:column;gap:7px;pointer-events:none;transition:opacity .3s}
+#scores{position:fixed;right:16px;top:calc(env(safe-area-inset-top,0px) + 12px);width:142px;display:flex;flex-direction:column;gap:7px;pointer-events:none;transition:opacity .3s}
 #scores.old{opacity:.5}
 .sc-head{text-align:right;color:var(--chalk);text-shadow:0 1px 4px rgba(0,0,0,.6)}
 #scTiles{display:flex;flex-direction:column;gap:7px}
@@ -248,7 +248,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
   #pixWrap.on{transform:none}
   #impWrap{width:40%}
   #impLab{font-size:.6rem}
-  #scores{width:84px;right:8px;top:calc(env(safe-area-inset-top,0px) + 70px);gap:5px}
+  #scores{width:96px;right:8px;top:calc(env(safe-area-inset-top,0px) + 12px);gap:5px}
   #scTiles{gap:5px}
   .tile{padding:4px 7px 5px}.tile b{font-size:1.65rem}.tile .lab{font-size:.54rem;letter-spacing:.06em}.tile .tier{font-size:.54rem;letter-spacing:.08em}
   .tile.total b{font-size:2.1rem}
@@ -256,7 +256,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 .coinpill{position:fixed;left:16px;top:calc(env(safe-area-inset-top,0px) + 82px);display:flex;align-items:center;gap:6px;background:rgba(12,36,24,.88);border:1px solid rgba(255,211,77,.35);border-radius:999px;padding:3px 10px 3px 4px;font-family:var(--display);font-weight:800;font-size:1rem;color:#ffd34d;pointer-events:none}
 .coinpill i,.coinbig i,.pk-p i{display:inline-block;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff3b0,#f2c230 45%,#a87400);box-shadow:inset 0 0 0 2px rgba(120,80,0,.5)}
 .coinpill.bump{animation:pop .45s cubic-bezier(.2,1.7,.4,1)}
-#coinPop{position:fixed;left:16px;top:calc(env(safe-area-inset-top,0px) + 100px);font-family:var(--display);font-weight:800;font-size:.95rem;color:#ffd34d;text-shadow:0 2px 6px rgba(0,0,0,.7);opacity:0;pointer-events:none}
+#coinPop{display:none;position:fixed;left:16px;top:calc(env(safe-area-inset-top,0px) + 100px);font-family:var(--display);font-weight:800;font-size:.95rem;color:#ffd34d;text-shadow:0 2px 6px rgba(0,0,0,.7);opacity:0;pointer-events:none}
 #coinPop.on{animation:coinup 1.8s ease-out forwards}
 @keyframes coinup{0%{opacity:0;transform:translateY(8px)}15%{opacity:1;transform:none}75%{opacity:1}100%{opacity:0;transform:translateY(-14px)}}
 .coinbig{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:800;font-size:1.7rem;color:#ffd34d}
@@ -336,11 +336,13 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 #dock .dockrow{align-items:stretch}
 @media (max-width:620px){.club2{min-width:0;flex:1}#clubIcon{width:44px;height:30px}#lockBtn{min-width:92px;padding:0 14px;font-size:1.35rem}.dockrow .readout{display:none}.ctrls{flex:1}}
 #dock.locked #lockBtn{display:none}
-.shotstats{display:flex;flex-direction:column;gap:4px;margin-top:2px;background:rgba(12,36,24,.9);border:1px solid rgba(243,246,238,.12);border-radius:6px;padding:8px 12px}
-.shotstats div{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.shotstats .lab{font-size:.6rem}
-.shotstats b{font-family:var(--display);font-weight:800;font-size:1.25rem;font-variant-numeric:tabular-nums;color:var(--chalk)}
-#hitcam{position:fixed;left:16px;top:calc(env(safe-area-inset-top,0px) + 114px);width:min(340px,40vw);aspect-ratio:96/66;border:4px solid #0a1c12;box-shadow:0 0 0 2px #f3f6ee,0 12px 30px rgba(0,0,0,.45);background:#7cc6ef;opacity:0;transform:translateX(-12px);transition:opacity .35s,transform .25s;pointer-events:none;z-index:3}
+.shotstats{display:flex;flex-direction:column;gap:3px;background:rgba(12,36,24,.9);border:1px solid rgba(243,246,238,.12);border-radius:6px;padding:6px 9px}
+.srow{display:grid;grid-template-columns:auto 1fr;column-gap:6px;align-items:baseline}
+.srow .lab{font-size:.56rem;grid-row:1}
+.srow b{font-family:var(--display);font-weight:800;font-size:1.05rem;font-variant-numeric:tabular-nums;color:var(--chalk);text-align:right;grid-row:1}
+.srow em{grid-column:1 / -1;font-style:normal;font-family:var(--display);font-weight:700;font-size:.66rem;letter-spacing:.04em;text-align:right;color:var(--fog);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.srow em.bad{color:#ff6d61}.srow em.mid{color:#ffab52}.srow em.good{color:#66dd93}
+#hitcam{position:fixed;left:16px;top:calc(env(safe-area-inset-top,0px) + 84px);width:min(340px,40vw);aspect-ratio:96/66;border:4px solid #0a1c12;box-shadow:0 0 0 2px #f3f6ee,0 12px 30px rgba(0,0,0,.45);background:#7cc6ef;opacity:0;transform:translateX(-12px);transition:opacity .35s,transform .25s;pointer-events:none;z-index:3}
 #hitcam.on{opacity:1;transform:none}
 #hitcam.on.fade{opacity:0}
 #hitc{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges}
@@ -350,7 +352,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 .hc-slow{position:absolute;right:6px;top:22px;font-family:var(--display);font-weight:800;font-style:italic;font-size:.8rem;letter-spacing:.1em;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 #hitLab{position:absolute;left:0;right:0;bottom:0;text-align:center;font-family:var(--display);font-weight:800;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;padding:3px;background:rgba(10,28,18,.88);color:var(--chalk)}
 #hitLab.sweet{background:#ffd34d;color:#2a1c00}#hitLab.ok{color:#64c1ff}#hitLab.bad{color:#ff6d61}
-@media (max-width:620px){#swingUI #meter{height:74px}#hitcam{left:8px;width:52vw;top:calc(env(safe-area-inset-top,0px) + 106px)}.shotstats b{font-size:1rem}.shotstats{padding:6px 7px}}
+@media (max-width:620px){#swingUI #meter{height:74px}#hitcam{left:8px;width:52vw;top:calc(env(safe-area-inset-top,0px) + 76px)}.srow b{font-size:.92rem}.shotstats{padding:5px 6px}}
 @media (prefers-reduced-motion:reduce){.hc-top i{animation:none}}
 #top{align-items:flex-start}
 .hud{display:flex;align-items:stretch;background:rgba(12,36,24,.9);border:1px solid rgba(243,246,238,.1);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.3);overflow:hidden}
@@ -362,13 +364,13 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 .hwind{flex-direction:row;align-items:center;gap:8px}
 .hwind svg{width:30px;height:30px;transition:transform .4s}
 .hwind div{display:flex;flex-direction:column}
-.pausebtn{width:46px;height:46px;border:1px solid rgba(243,246,238,.1);border-radius:8px;background:rgba(12,36,24,.9);display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
-.pausebtn i{display:block;width:5px;height:18px;border-radius:2px;background:var(--chalk)}
+.pausebtn{align-self:stretch;width:30px;border:0;border-left:1px solid rgba(243,246,238,.1);background:transparent;display:flex;align-items:center;justify-content:center;gap:3px;padding:0}
+.pausebtn i{display:block;width:3px;height:11px;border-radius:1px;background:var(--fog)}
 .pausebtn:hover{background:var(--pine-3)}
 .pmenu{display:flex;flex-direction:column;gap:8px}
 .pmenu .btn{text-align:left;display:flex;justify-content:space-between;align-items:center}
 .pmenu .btn span{font-style:normal;font-weight:600;font-size:.85rem;color:var(--fog)}
-@media (max-width:620px){.hsec{padding:6px 11px 7px}.hbig{font-size:1.45rem}.hwind svg{width:24px;height:24px}.pausebtn{width:42px;height:42px}}
+@media (max-width:620px){.hsec{padding:6px 11px 7px}.hbig{font-size:1.45rem}.hwind svg{width:24px;height:24px}.pausebtn{width:26px}}
 </style>
 
 <canvas id="c" aria-label="Golf course"></canvas>
@@ -378,8 +380,8 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
     <div class="hsec hhole"><span class="lab" id="hnLab">Hole</span><b class="hbig"><span id="hNum">1</span><sup id="hPar">P4</sup></b><span class="hsub" id="hL2">Shot 1</span></div>
     <div class="hsec hwind" title="Wind"><svg viewBox="0 0 30 30" id="windArrow" aria-hidden="true"><circle cx="15" cy="15" r="13.5" fill="none" stroke="rgba(243,246,238,.22)" stroke-width="1.5"/><path d="M6 15h15M16 9l6 6-6 6" fill="none" stroke="#f6c51b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b class="hbig" id="windTxt">8</b><span class="lab">mph</span></div></div>
     <div class="hsec hdist"><span class="lab" id="hDistLab">To pin</span><b class="hbig" id="hDist">412</b><span class="hsub" id="hDistU">yards</span></div>
+    <button class="pausebtn" id="bPause" aria-label="Pause menu" title="Pause (P)"><i></i><i></i></button>
   </div>
-  <button class="pausebtn" id="bPause" aria-label="Pause menu" title="Pause (P)"><i></i><i></i></button>
   <div id="legacyBtns" hidden><span id="hL1"></span><span id="hTotLab"></span><span id="hTot"></span>
     <button class="tbtn" id="bMap" aria-pressed="false" title="Hole overview (V)"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M1.5 4l5-2 5 2 5-2v12l-5 2-5-2-5 2z M6.5 2v12 M11.5 4v12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><span>Map</span></button>
     <button class="tbtn" id="bCard" title="Scorecard (C)"><svg viewBox="0 0 18 18" aria-hidden="true"><rect x="1.5" y="3" width="15" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M1.5 7.5h15M6 3v12M11 3v12" stroke="currentColor" stroke-width="1.5"/></svg><span>Card</span></button>
@@ -417,7 +419,7 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 <div id="hitcam" aria-hidden="true"><canvas id="hitc" width="96" height="66"></canvas><div class="hc-top"><span><i></i>BALL HIT CAM · <b id="hitClub">7 IRON</b></span><span id="hitRep">REPLAY 1/3</span></div><div class="hc-slow">SLOW MO</div><div id="hitLab"></div></div>
 
 <div id="pixWrap" aria-hidden="true"><canvas id="pix" width="128" height="96"></canvas><div id="impWrap"><canvas id="imp" width="48" height="40"></canvas><div class="imp-top">IMPACT CAM</div><div id="impLab"></div></div></div>
-<div id="scores" hidden aria-live="polite"><div class="lab sc-head" id="scHead">Swing</div><div id="scTiles"></div><div class="tile total" id="scTotal"><span class="lab">Score</span><b>··</b><span class="tier">&nbsp;</span></div><div class="shotstats" id="shotStats" hidden><div><span class="lab">Carry</span><b id="stCarry">·</b></div><div><span class="lab">Total</span><b id="stTotal">·</b></div><div><span class="lab" id="stSpdLab">Swing speed</span><b id="stSpeed">·</b></div></div></div>
+<div id="scores" hidden aria-live="polite"><div class="lab sc-head" id="scHead">Swing</div><div id="scTiles"></div><div class="tile total" id="scTotal"><span class="lab">Score</span><b>··</b><span class="tier">&nbsp;</span></div><div class="shotstats" id="shotStats" hidden><div class="srow"><span class="lab">Carry</span><b id="stCarry">·</b><em id="stCarryD"></em></div><div class="srow"><span class="lab">Total</span><b id="stTotal">·</b><em id="stTotalD"></em></div></div></div>
 
 <div id="coinPill" class="coinpill" hidden><i></i><b id="coinTxt">0</b></div><div id="coinPop"></div>
 
@@ -965,7 +967,7 @@ function holeSeed(i){return (Math.imul(G.seed^0x9e3779b9,2654435761)+i*7919+13)>
 function showPlay(){
  $('menu').hidden=true;$('cardOv').hidden=true;
  $('top').hidden=false;$('dock').hidden=false;
- $('coinPill').hidden=false;$('coinTxt').textContent=INV.coins.toLocaleString();
+ $('coinPill').hidden=true;
  const t=train();$('bCard').hidden=t;$('bMap').hidden=t;$('bBag').hidden=!t;$('bSpot').hidden=!t;$('bExit').hidden=!t;
  $('report').hidden=true;sw.last=null;$('scores').hidden=true;
  measureVR();
@@ -1142,20 +1144,38 @@ function updateSwing(dt){
 const SHOT={on:false,start:null,carry:null,total:null,speed:0,putt:false};
 const SPEED={wood:108,hybrid:98,'4i':92,'5i':90,'6i':88,'7i':86,'8i':84,'9i':82,pw:80,gw:78,sw:76,lw:74};
 function startStats(){
- const c=CLUBS[ci],g=game(),pw=Math.min(1.1,sw.v.power||0);
- const base=c.cat==='long'?(c.id==='longiron'?100:SPEED[c.type]||100):SPEED[c.id]||80;
- let sp=g==='putt'?0:base*Math.pow(Math.max(.05,pw),.6)*(g==='chip'?.45:mode==='bump'?.5:1);
- if(g==='full'){const e=(sw.v.t||1)-1;sp*=1+clamp(-e,-.3,.3)*.08;}
- Object.assign(SHOT,{on:true,start:{x:ball.x,y:ball.y},carry:null,total:null,speed:Math.round(sp),putt:g==='putt'});
- $('stSpdLab').textContent=g==='putt'?'Stroke':'Swing speed';$('shotStats').hidden=false;
+ const c=CLUBS[ci],g=game();
+ // a perfect strike flies the planned distance and rolls a typical amount for the club
+ const carry=g==='putt'?0:Math.min(plan,maxDist());
+ const roll=g==='putt'?0:mode==='bump'||mode==='chip'?carry*planRatio():carry*(c.cat==='long'?.12:c.cat==='wedges'?.03:.06);
+ Object.assign(SHOT,{on:true,start:{x:ball.x,y:ball.y},carry:null,total:null,putt:g==='putt',idealC:carry,idealT:g==='putt'?Math.min(plan,maxDist()):carry+roll});
+ $('shotStats').hidden=false;
+}
+// the part of the swing that cost the most distance, in a word or two
+function shotReason(){
+ const L=sw.last;if(!L)return'';
+ const sc=L.scores,v=L.verdicts.map(x=>String(x).split(' · ')[0].toLowerCase());
+ let idx;
+ if(L.game==='full')idx=[3,0,1,2];else if(L.game==='chip')idx=[2,1,0];else idx=[2,1,0];
+ let worst=null;for(const i of idx)if(sc[i]<85&&(worst===null||sc[i]<sc[worst]))worst=i;
+ if(worst===null)return'';
+ const w=v[worst];
+ if(L.game==='full'&&worst===0)return w.includes('short')?'short backswing':w.includes('overswing')?'overswing':'long backswing';
+ if(L.game!=='full'&&worst===1)return w.includes('short')?'short stroke':'long stroke';
+ return w.replace(/ \d.*$/,'');
 }
 function statsTick(){
  if(!SHOT.on)return;
  const live=SHOT.total===null?hyp(ball.x-SHOT.start.x,ball.y-SHOT.start.y):SHOT.total;
  const f=v=>SHOT.putt?fmtFt(v):Math.round(v)+' yd';
+ const delta=(val,ideal,el,done)=>{const e=$(el);if(!done||!ideal){e.textContent='';e.className='';return;}
+  const pc=Math.round((val/ideal-1)*100),r=shotReason();
+  if(Math.abs(pc)<=3){e.textContent='✓ on target';e.className='good';return;}
+  e.textContent=`${pc>0?'+':MINUS}${Math.abs(pc)}%${r?' · '+r:''}`;e.className=Math.abs(pc)>=20?'bad':'mid';};
  $('stCarry').textContent=SHOT.putt?'·':SHOT.carry===null?'·':f(SHOT.carry);
+ delta(SHOT.carry||0,SHOT.idealC,'stCarryD',!SHOT.putt&&SHOT.carry!==null);
  $('stTotal').textContent=f(live);
- $('stSpeed').textContent=SHOT.putt?(sw.last?sw.last.verdicts[2]:'·'):SHOT.speed+' mph';
+ delta(live,SHOT.idealT,'stTotalD',SHOT.total!==null);
 }
 function endStats(){if(SHOT.on&&SHOT.total===null)SHOT.total=hyp(ball.x-SHOT.start.x,ball.y-SHOT.start.y);}
 function hit(){
