@@ -328,7 +328,7 @@ body.touch #lockBtn{display:block}
 .shotstats div{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .shotstats .lab{font-size:.6rem}
 .shotstats b{font-family:var(--display);font-weight:800;font-size:1.25rem;font-variant-numeric:tabular-nums;color:var(--chalk)}
-#hitcam{position:fixed;left:16px;top:calc(env(safe-area-inset-top,0px) + 102px);width:min(340px,40vw);aspect-ratio:80/56;border:4px solid #0a1c12;box-shadow:0 0 0 2px #f3f6ee,0 12px 30px rgba(0,0,0,.45);background:#7cc6ef;opacity:0;transform:translateX(-12px);transition:opacity .35s,transform .25s;pointer-events:none;z-index:3}
+#hitcam{position:fixed;left:16px;top:calc(env(safe-area-inset-top,0px) + 102px);width:min(340px,40vw);aspect-ratio:96/66;border:4px solid #0a1c12;box-shadow:0 0 0 2px #f3f6ee,0 12px 30px rgba(0,0,0,.45);background:#7cc6ef;opacity:0;transform:translateX(-12px);transition:opacity .35s,transform .25s;pointer-events:none;z-index:3}
 #hitcam.on{opacity:1;transform:none}
 #hitcam.on.fade{opacity:0}
 #hitc{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges}
@@ -386,7 +386,7 @@ body.touch #lockBtn{display:block}
   </div>
   <div id="hint"></div>
 </div>
-<div id="hitcam" aria-hidden="true"><canvas id="hitc" width="80" height="56"></canvas><div class="hc-top"><span><i></i>BALL HIT CAM</span><span id="hitRep">REPLAY 1/3</span></div><div class="hc-slow">SLOW MO</div><div id="hitLab"></div></div>
+<div id="hitcam" aria-hidden="true"><canvas id="hitc" width="96" height="66"></canvas><div class="hc-top"><span><i></i>BALL HIT CAM · <b id="hitClub">7 IRON</b></span><span id="hitRep">REPLAY 1/3</span></div><div class="hc-slow">SLOW MO</div><div id="hitLab"></div></div>
 
 <div id="pixWrap" aria-hidden="true"><canvas id="pix" width="128" height="96"></canvas><div id="impWrap"><canvas id="imp" width="48" height="40"></canvas><div class="imp-top">IMPACT CAM</div><div id="impLab"></div></div></div>
 <div id="scores" hidden aria-live="polite"><div class="lab sc-head" id="scHead">Swing</div><div id="scTiles"></div><div class="tile total" id="scTotal"><span class="lab">Score</span><b>··</b><span class="tier">&nbsp;</span></div><div class="shotstats" id="shotStats" hidden><div><span class="lab">Carry</span><b id="stCarry">·</b></div><div><span class="lab">Total</span><b id="stTotal">·</b></div><div><span class="lab" id="stSpdLab">Swing speed</span><b id="stSpeed">·</b></div></div></div>
@@ -768,7 +768,7 @@ let mode='full', spinLv=1, ph=0;
 let shapeLv=0,locked=false;const SHAPES=[[-1,'Draw'],[0,'Straight'],[1,'Fade']];
 function shapeCurve(){const c=CLUBS[ci];return mode==='full'?shapeLv*5.5*(c.work||1):0;}
 function shapeLat(d){const T=1.15+d/110;return .5*shapeCurve()*T*T;}
-const SPIN=['Low','Mid','High'], SPINV=[.3,.65,1], FLIGHT_APEX=[.5,1,1.55];
+const SPIN=['Low','Mid','High'], SPINV=[.3,.65,1], FLIGHT_APEX=[.5,1,1.55], FLIGHT_CARRY=[1.22,1,.8];
 const meter={pos:0,v:0};
 const sw={osc:0,v:{},scores:[],last:null};
 let plan=0,planUser=false;
@@ -819,7 +819,7 @@ function putterRange(){return clamp(distPin()*1.3+1.5,4,42);}
 function maxDist(){
  const c=CLUBS[ci];
  if(mode==='putt')return putterRange();
- if(mode==='chip')return Math.min(42,c.c*.42)*lieMult(lie,c);
+ if(mode==='chip')return Math.min(46,c.c*.42*FLIGHT_CARRY[spinLv])*lieMult(lie,c);
  if(mode==='bump')return Math.min(32,c.c*.21)*lieMult(lie,c);
  return c.c*lieMult(lie,c);
 }
@@ -1884,11 +1884,11 @@ function pixUpdate(dt){
 
 /* ---------- ball hit cam: slow motion club and ball, three replays top left, then it fades ---------- */
 const hcv=$('hitc'),hc=hcv.getContext('2d');
-const HW=80,HH=56,HC={on:false,t:0,S:null,loop:1.15,loops:3};
+const HW=96,HH=66,HC={on:false,t:0,S:null,loop:1.15,loops:3};
 function startHitCam(S){
  if(!S)return;
  Object.assign(HC,{on:true,t:0,S});
- const lab=hitLabel(S);$('hitLab').textContent=lab.t;$('hitLab').className=lab.c;
+ const lab=hitLabel(S);$('hitClub').textContent=hitHead(S).n;$('hitLab').textContent=lab.t;$('hitLab').className=lab.c;
  const w=$('hitcam');w.classList.remove('fade');w.classList.add('on');
 }
 function hitLabel(S){
@@ -1909,49 +1909,122 @@ function hcUpdate(dt){
  $('hitRep').textContent=`REPLAY ${li+1}/${HC.loops}`;
  drawHitCam(Math.min(HC.loop,HC.t-li*HC.loop));
 }
-function drawHitCam(ti){
- const S=HC.S,c=hc,gy=40,bx=40,br=7,by=gy-br-(S.g==='full'&&lie==='tee'?3:0);
- c.setTransform(1,0,0,1,0,0);
- // sky and a blurred tree line, then the ground
- const sk=['#7cc6ef','#97d3f3','#b6e0f6','#d2edf8'];sk.forEach((col,i)=>{c.fillStyle=col;c.fillRect(0,i*7,HW,7);});
- for(let x=0;x<HW;x++){const h=4+((x*31)%4);c.fillStyle=(x>>1)%3?'#2f6a35':'#285e2e';c.fillRect(x,28-h,1,h+1);}
- c.fillStyle='#4f9a42';c.fillRect(0,27,HW,gy-27);c.fillStyle='#5aa64a';for(let y=30;y<gy;y+=3)c.fillRect(0,y,HW,1);
- pixGround(c,HW,HH,gy);
- c.fillStyle='rgba(0,0,0,.12)';c.fillRect(bx-6,gy,12,2);
- // grass blades in the foreground for depth
- c.fillStyle='rgba(30,80,30,.55)';for(let x=0;x<HW;x+=3)c.fillRect(x,gy+((x*7)%3),1,2);
- const contact=.45,putt=S.g==='putt';
- // club head path: sweeps in from the left, slower near the ball
- const k=ti<contact?easeOut(ti/contact):1;
- let fx=-6+(bx-br-1+6)*k;
- if(ti>contact)fx=bx-br-1+(ti-contact)*(S.fat?14:putt?10:34);
- const faceY=by+S.vN*4+(S.fat?3:0);
- // motion trail of the club head
- for(let i=3;i>0;i--){const tx=fx-i*3*(ti<contact?1:.4);c.fillStyle=`rgba(80,90,100,${.12*(4-i)})`;c.fillRect(Math.round(tx)-2,Math.round(faceY)-6,3,12);}
- // fat: the club digs in before the ball
- if(S.fat&&ti>contact*.7){c.fillStyle=PAL.dirt;for(let i=0;i<16;i++){const a=i*.7,r=(ti-contact*.7)*30;c.fillRect(Math.round(bx-6+Math.cos(a)*r*.6),Math.round(gy-1-Math.abs(Math.sin(a))*r*.8),1,1);}}
- // ball: squash at contact, then leaves with a ghost trail
- let ballX=bx,ballY=by,sq=0;
- if(ti>contact){
-  const d=ti-contact;sq=d<.07?1:0;
-  const sp=putt?16:S.chunk?12:S.topped?40:S.fat?22:S.thin?48:40,up=putt?0:S.chunk?6:S.topped?0:S.thin?6:S.fat?16:22;
-  ballX=bx+d*sp;ballY=by-d*up+(S.topped?Math.abs(Math.sin(d*16))*-2:0);
-  if(!sq)for(let i=3;i>0;i--){c.fillStyle=`rgba(255,255,255,${.12*(4-i)})`;pdisc(c,ballX-i*d*sp*.12,ballY+i*d*up*.12,br*.9,`rgba(255,255,255,${.1*(4-i)})`);}
+// pixel polygon fill (even odd scanlines)
+function pfillPoly(c,pts,col){
+ c.fillStyle=col;let y0=1e9,y1=-1e9;for(const p of pts){y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1]);}
+ for(let y=Math.floor(y0);y<=Math.ceil(y1);y++){const yc=y+.5,xs=[];
+  for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length];if((a[1]<=yc&&b[1]>yc)||(b[1]<=yc&&a[1]>yc))xs.push(a[0]+(yc-a[1])/(b[1]-a[1])*(b[0]-a[0]));}
+  xs.sort((m,n)=>m-n);for(let i=0;i+1<xs.length;i+=2)c.fillRect(Math.round(xs[i]),y,Math.max(1,Math.round(xs[i+1])-Math.round(xs[i])),1);}
+}
+function pstroke(c,pts,col){for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length];pbrush(c,a[0],a[1],b[0],b[1],1,col);}}
+// which head the replay shows: a 7 iron for irons, a wedge, the long club you carry, or the putter
+function hitHead(S){
+ const c=S.club||{};
+ if(S.g==='putt')return{k:'putter',n:'PUTTER',loft:3};
+ if(S.g==='chip'||c.cat==='wedges')return{k:'iron',n:'WEDGE',loft:52,H:9};
+ if(c.cat==='long')return c.id==='woods'?{k:'wood',n:'WOOD',loft:15}:c.id==='hybrid'?{k:'hybrid',n:'HYBRID',loft:20}:{k:'iron',n:'LONG IRON',loft:18,H:7};
+ return{k:'iron',n:'7 IRON',loft:34,H:8};
+}
+// draws the head with its leading edge at (lx,ly)
+function drawHead(c,hd,lx,ly){
+ // sized against the ball (radius 7): an iron face is taller than the ball, a wood much bigger
+ const out=PAL.out,steel='#aeb7c0',steelD='#7d8790',lite='#e6ebef';
+ const shape=(poly,fill)=>{pfillPoly(c,poly.map(p=>[p[0]-.8,p[1]-.8]),out);pfillPoly(c,poly.map(p=>[p[0]+.8,p[1]+.8]),out);pfillPoly(c,poly,fill);};
+ let shaftFrom,lean;
+ if(hd.k==='iron'){
+  const H=(hd.H||8)*1.75,a=hd.loft*Math.PI/180,ft=[lx-H*Math.sin(a),ly-H*Math.cos(a)];
+  // face, top line, cavity back and sole
+  shape([[lx,ly],ft,[ft[0]-5,ft[1]+2],[lx-12,ly-5],[lx-11,ly]],steel);
+  pfillPoly(c,[[lx-11,ly],[lx-12,ly-5],[lx-7,ly-3.6],[lx-5,ly]],steelD);
+  pfillPoly(c,[[lx-10,ly-.2],[lx-1,ly-.2],[lx-1.5,ly-1.4],[lx-10,ly-1.4]],'#cfd6dc');
+  for(let i=1;i<=5;i++){const t=i/6.2;pbrush(c,lx+(ft[0]-lx)*t-.5,ly+(ft[1]-ly)*t,lx+(ft[0]-lx)*t-1.8,ly+(ft[1]-ly)*t+.4,1,lite);}
+  pbrush(c,lx,ly,ft[0],ft[1],1,lite);
+  shaftFrom=[ft[0]-4,ft[1]+.5];lean=[.28,-1];
+  pbrush(c,shaftFrom[0],shaftFrom[1]+1,shaftFrom[0]+1.8,shaftFrom[1]-6,3,'#8f99a3');shaftFrom=[shaftFrom[0]+1.8,shaftFrom[1]-6];
+ }else if(hd.k==='wood'||hd.k==='hybrid'){
+  const s=hd.k==='wood'?1.7:1.3,H=9*s,a=hd.loft*Math.PI/180,ft=[lx-H*Math.sin(a),ly-H*Math.cos(a)];
+  shape([[lx,ly],[lx+.6,ly-H*.5],ft,[ft[0]-4*s,ft[1]-1.6*s],[ft[0]-9*s,ft[1]+.4*s],[lx-13*s,ly-3*s],[lx-11*s,ly-.3],[lx-4*s,ly+.5]],hd.k==='wood'?'#2c3138':'#3a4048');
+  pbrush(c,ft[0]-2*s,ft[1]-1*s,ft[0]-8*s,ft[1]+.3*s,1,'#5f6b7a');
+  pbrush(c,lx,ly,ft[0],ft[1],1,'#8f99a3');
+  for(let i=1;i<=3;i++){const t=i/4;pbrush(c,lx+(ft[0]-lx)*t-.6,ly+(ft[1]-ly)*t,lx+(ft[0]-lx)*t-2,ly+(ft[1]-ly)*t+.3,1,'#6f7a86');}
+  c.fillStyle='#d6dde3';c.fillRect(Math.round(lx-8*s),Math.round(ly-1),4,1);
+  shaftFrom=[ft[0]-6*s,ft[1]-1];lean=[.08,-1];
+ }else{
+  const poly=[[lx,ly],[lx,ly-6],[lx-17,ly-6],[lx-17,ly]];
+  shape(poly,steel);c.fillStyle=lite;c.fillRect(Math.round(lx-9),Math.round(ly-6),1,6);c.fillStyle=steelD;c.fillRect(Math.round(lx-17),Math.round(ly-2),17,2);
+  shaftFrom=[lx-3,ly-6];lean=[.12,-1];
+  pbrush(c,shaftFrom[0],shaftFrom[1],shaftFrom[0]-2,shaftFrom[1]-4,3,'#8f99a3');shaftFrom=[shaftFrom[0]-2,shaftFrom[1]-4];
  }
- if(S.g==='full'&&lie==='tee'){c.fillStyle='#f4f4f4';c.fillRect(bx-1,gy-3,2,3);}
+ const L=70,n=Math.hypot(lean[0],lean[1]);
+ pbrush(c,shaftFrom[0],shaftFrom[1],shaftFrom[0]+lean[0]/n*L,shaftFrom[1]+lean[1]/n*L,2,'#c3cbd3');
+ pbrush(c,shaftFrom[0]+.7,shaftFrom[1],shaftFrom[0]+.7+lean[0]/n*L,shaftFrom[1]+lean[1]/n*L,1,'#eef2f5');
+}
+// the swing path through impact: a parabola with its low point before, at or after the ball
+function hitPath(S,hd,bx,by,br,gy){
+ const xc=bx-br+1;
+ let xLow,yLow,target;
+ if(hd.k==='putter'){return{xc,y:()=>gy-.5};}
+ if(hd.k==='wood'||hd.k==='hybrid'){
+  const teed=S.g==='full'&&lie==='tee';
+  xLow=xc+1;yLow=teed?by+br*.6:gy-.4;target=yLow-.3;
+  if(S.thin||S.topped){yLow-=S.topped?br*1.1:br*.5;target=yLow-.2;}
+  if(S.fat||S.chunk){xLow=xc-(S.chunk?12:6);yLow=gy+(S.chunk?3:1.5);target=by+br*.25;}
+ }else if(S.chunk){xLow=xc-12;yLow=gy+3.5;target=by+br*.35;}
+ else if(S.fat){xLow=xc-6;yLow=gy+2;target=by+br*.2;}
+ else if(S.topped){xLow=xc+2;yLow=by-br*.35;target=yLow-.2;}
+ else if(S.thin){xLow=xc+2;yLow=by+br*.15;target=yLow-.2;}
+ else{xLow=xc+(hd.n==='WEDGE'?7:6);yLow=gy+1.6;target=by+br*.55;}
+ const k=Math.max(.004,(yLow-target)/Math.max(1,(xc-xLow)*(xc-xLow)));
+ return{xc,xLow,yLow,y:x=>yLow-k*(x-xLow)*(x-xLow)};
+}
+function drawHitCam(ti){
+ const S=HC.S,c=hc,gy=46,br=7,bx=52;
+ const hd=hitHead(S),teed=S.g==='full'&&lie==='tee'&&(hd.k==='wood'||hd.k==='hybrid');
+ const by=gy-br-(teed?4:0);
+ c.setTransform(1,0,0,1,0,0);
+ ['#7cc6ef','#97d3f3','#b6e0f6','#d2edf8'].forEach((col,i)=>{c.fillStyle=col;c.fillRect(0,i*8,HW,8);});
+ for(let x=0;x<HW;x++){const h=4+((x*31)%4);c.fillStyle=(x>>1)%3?'#2f6a35':'#285e2e';c.fillRect(x,31-h,1,h+1);}
+ c.fillStyle='#4f9a42';c.fillRect(0,31,HW,gy-31);c.fillStyle='#5aa64a';for(let y=34;y<gy;y+=3)c.fillRect(0,y,HW,1);
+ pixGround(c,HW,HH,gy);
+ const P=hitPath(S,hd,bx,by,br,gy);
+ const tc=.48,end=HC.loop;
+ // club x over time: slows into the ball like a slow motion camera, then carries on
+ const x0=-16;
+ let lx=ti<tc?x0+(P.xc-x0)*(1-Math.pow(1-ti/tc,1.6)):P.xc+(ti-tc)*(S.chunk?6:S.fat?12:hd.k==='putter'?10:30);
+ let ly=P.y(lx);
+ if(hd.k!=='putter'&&ly>gy+3.5)ly=gy+3.5;
+ // divot or chunk: the turf the club takes, ball first on a pure iron, ground first on a fat one
+ const digs=hd.k==='iron'&&!S.thin&&!S.topped&&P.yLow>gy;
+ if(digs&&lx>P.xLow-6){
+  const a=Math.max(P.xLow-6,P.xLow-10),b=Math.min(lx,P.xLow+6);
+  if(b>a){c.fillStyle='#5a3b22';c.fillRect(Math.round(a),gy,Math.round(b-a),2);c.fillStyle='#7a5232';c.fillRect(Math.round(a),gy+2,Math.round(b-a),1);}
+  const d=Math.max(0,lx-P.xLow+2)/30;
+  for(let i=0;i<9;i++){const px=P.xLow+i*1.4+d*40*(1+i*.1),py=gy-1-d*26*(1-i/12)+d*d*22;if(py<gy+1){c.fillStyle=i%3?PAL.grass:'#7a5232';c.fillRect(Math.round(px),Math.round(py),2,1);}}
+ }
+ if((S.fat||S.chunk)&&lx>P.xLow-8){
+  const d=lx-(P.xLow-8);
+  for(let i=0;i<18;i++){const a=i*.9,r=Math.min(18,d*.9)*(.5+(i%5)/6);c.fillStyle=i%2?PAL.dirt:'#5a3b22';c.fillRect(Math.round(P.xLow+Math.cos(a)*r*.5),Math.round(gy-1-Math.abs(Math.sin(a))*r*.9),1,1);}
+ }
+ // ball: compresses on the face, then leaves with backspin and a ghost trail
+ let ballX=bx,ballY=by,sq=0,rot=0;
+ const contact=lx>=P.xc-.5;
+ if(contact){
+  const tHit=tc,d=Math.max(0,ti-tHit);sq=d<.07?1:0;
+  const launch=hd.k==='putter'?0:S.topped?-.05:S.chunk?.5:S.thin?.07:S.fat?.45:(hd.loft*.55+4)*Math.PI/180;
+  const sp=hd.k==='putter'?14:S.chunk?10:S.topped?36:S.fat?18:S.thin?50:44;
+  ballX=bx+d*sp*Math.cos(launch);ballY=by-d*sp*Math.sin(launch);
+  if(S.topped){ballY=by+Math.min(br-1,d*40)-Math.abs(Math.sin(d*14))*3;if(d>.1)ballY=by-Math.abs(Math.sin(d*14))*3;}
+  rot=d*(hd.k==='putter'?-10:S.thin||S.topped?4:24);
+  if(!sq)for(let i=3;i>0;i--)pdisc(c,ballX-i*d*sp*.1*Math.cos(launch),ballY+i*d*sp*.1*Math.sin(launch),br*.85,`rgba(255,255,255,${.09*(4-i)})`);
+ }
+ if(teed){c.fillStyle=PAL.out;c.fillRect(bx-2,gy-4,4,5);c.fillStyle='#f4f4f4';c.fillRect(bx-1,gy-4,2,5);}
  if(sq){c.fillStyle=PAL.out;for(let y=-8;y<=8;y++)for(let x=-6;x<=6;x++)if((x*x)/34+(y*y)/66<=1)c.fillRect(ballX+x,Math.round(ballY)+y,1,1);c.fillStyle='#ffffff';for(let y=-7;y<=7;y++)for(let x=-5;x<=5;x++)if((x*x)/24+(y*y)/50<=1)c.fillRect(ballX+x,Math.round(ballY)+y,1,1);}
- else{pdisc(c,ballX,ballY,br+.8,PAL.out);pdisc(c,ballX,ballY,br,'#ffffff');pdisc(c,ballX+2,ballY+2,3,PAL.ballD);c.fillStyle=PAL.ballD;for(const[dx,dy]of[[-3,-2],[0,-4],[2,-1],[-1,1],[3,3]])c.fillRect(Math.round(ballX)+dx,Math.round(ballY)+dy,1,1);}
- // the club: shaft and a big face seen from the side, grooves catch the light
- const wood=S.g==='full'&&S.club.type==='wood';
- pbrush(c,fx-12,faceY-30,fx-1,faceY-7,2,PAL.shaft);
- c.fillStyle=PAL.out;c.fillRect(Math.round(fx)-(wood?7:4),Math.round(faceY)-8,wood?9:6,16);
- c.fillStyle=putt?'#aeb6bf':wood?'#2c3138':'#8f99a3';c.fillRect(Math.round(fx)-(wood?6:3),Math.round(faceY)-7,wood?7:4,14);
- c.fillStyle='#e3e9ee';for(let y=-5;y<7;y+=2)c.fillRect(Math.round(fx),Math.round(faceY)+y,1,1);
- // impact flash and sparks on a good strike
- if(ti>contact&&ti<contact+.12){const r=3+(ti-contact)*70;pring(c,bx-br,faceY,r,S.last>=100?'#ffd34d':S.last>=85?'#ffffff':'rgba(255,255,255,.5)');
-  if(S.last>=85)for(let i=0;i<8;i++){const a=i/8*TAU;c.fillStyle=S.last>=100?'#ffd34d':'#ffffff';c.fillRect(Math.round(bx-br+Math.cos(a)*r*1.3),Math.round(faceY+Math.sin(a)*r*1.3),1,1);}}
- // a divot after a pure iron
- if(!putt&&!S.fat&&!S.topped&&S.club.type!=='wood'&&ti>contact+.05){c.fillStyle=PAL.grass;const d=ti-contact;for(let i=0;i<6;i++)c.fillRect(Math.round(bx+4+i*2+d*12),Math.round(gy-1-d*20*(1-i/8)+d*d*30),1,1);}
+ else{pdisc(c,ballX,ballY,br+.8,PAL.out);pdisc(c,ballX,ballY,br,'#ffffff');pdisc(c,ballX+2,ballY+2,3,PAL.ballD);
+  c.fillStyle=PAL.ballD;for(let i=0;i<6;i++){const a=i/6*TAU+rot;c.fillRect(Math.round(ballX+Math.cos(a)*4),Math.round(ballY+Math.sin(a)*4),1,1);}}
+ // club head on top of the ball until it has passed
+ drawHead(c,hd,lx,ly);
+ if(contact&&ti-tc<.12){const r=3+(ti-tc)*70;pring(c,bx-br,by+br*.3,r,S.last>=100?'#ffd34d':S.last>=85?'#ffffff':'rgba(255,255,255,.5)');
+  if(S.last>=85)for(let i=0;i<10;i++){const a=i/10*TAU;c.fillStyle=S.last>=100?'#ffd34d':'#ffffff';c.fillRect(Math.round(bx-br+Math.cos(a)*r*1.3),Math.round(by+br*.3+Math.sin(a)*r*1.3),1,1);}}
 }
 
 /* ---------- scoreboard: 1 to 100 per part, in tier colors ---------- */
@@ -2411,7 +2484,7 @@ function loop(now){
  update(dt);render();
  requestAnimationFrame(loop);
 }
-window.__hc=S=>{HC.S=S;};window.__hcDraw=t=>drawHitCam(t);
+window.__hc=S=>{HC.S=S;};window.__setLie=l=>{lie=l;};window.__hcDraw=t=>drawHitCam(t);
 window.__golf={get state(){return state},get ph(){return ph},get mode(){return mode},get ball(){return ball},get hole(){return hole},get aim(){return aim},get tut(){return tut},get last(){return sw.last},get clubs(){return CLUBS.map(c=>c.id)},get club(){return CLUBS[ci]&&{id:CLUBS[ci].id,cat:CLUBS[ci].cat,n:CLUBS[ci].n}},setCat:c=>setCat(c),setShape:v=>setShape(v),swingAction,startDaily,startTraining,setMode,setSpin,_dbg:()=>({osc:oscVal(),pos:meter.pos,fp:sw.v&&sw.v.fp,tt:sw.v&&sw.v.tt,pp:sw.v&&sw.v.plannedP,w:wins(),g:game(),stop:(mode==='chip'||mode==='bump')?predictStop(landingPoint()):null,land:landingPoint(),pin:hole.pin}),surfaceAt:(x,y)=>surfaceAt(x,y)};
 resize();
 showMenu();
