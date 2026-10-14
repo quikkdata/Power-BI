@@ -321,8 +321,20 @@ table.sc td.cur{background:rgba(246,197,27,.12)}
 #dock.off{opacity:0;pointer-events:none}
 #dock.off>*{pointer-events:none}
 .dockhint{text-align:center;font-size:.85rem;color:var(--chalk);text-shadow:0 1px 4px rgba(0,0,0,.7);min-height:1.1em}
-#lockBtn{display:none;border:0;border-radius:4px;background:var(--flag);color:var(--pine);font-family:var(--display);font-weight:800;font-style:italic;font-size:1.3rem;padding:10px}
-body.touch #lockBtn{display:block}
+#lockBtn{display:block;flex:0 0 auto;border:0;border-radius:6px;background:var(--flag);color:var(--pine);font-family:var(--display);font-weight:800;font-style:italic;font-size:1.6rem;letter-spacing:.03em;padding:0 26px;min-width:130px;box-shadow:0 4px 0 #a88200,0 8px 20px rgba(0,0,0,.35)}
+#lockBtn:active{transform:translateY(2px);box-shadow:0 2px 0 #a88200}
+.ctrls{display:flex;flex-direction:column;gap:6px;flex:0 0 auto}
+.aimrow{display:flex;gap:6px;align-items:stretch}
+.ab{border:0;border-radius:4px;background:#e2662a;color:#fff;font-family:var(--display);font-weight:800;font-size:1.2rem;min-width:40px;padding:4px 10px;box-shadow:0 3px 0 #9c3f14}
+.ab:active{transform:translateY(2px);box-shadow:0 1px 0 #9c3f14}
+.ablab{flex:1;display:flex;align-items:center;justify-content:center;background:rgba(12,36,24,.9);border-radius:4px;font-family:var(--display);font-weight:700;font-size:.95rem;letter-spacing:.08em;text-transform:uppercase;padding:0 14px}
+.clubsel{display:flex;gap:6px;align-items:stretch}
+.club2{display:flex;align-items:center;gap:8px;background:rgba(12,36,24,.9);border-radius:4px;padding:4px 10px 4px 6px;min-width:178px}
+#clubIcon{width:66px;height:45px;image-rendering:pixelated;image-rendering:crisp-edges;background:rgba(243,246,238,.06);border-radius:3px}
+.updn{display:flex;flex-direction:column;gap:4px}
+.updn .ab{flex:1;font-size:.85rem;padding:2px 10px}
+#dock .dockrow{align-items:stretch}
+@media (max-width:620px){.club2{min-width:0;flex:1}#clubIcon{width:44px;height:30px}#lockBtn{min-width:92px;padding:0 14px;font-size:1.35rem}.dockrow .readout{display:none}.ctrls{flex:1}}
 #dock.locked #lockBtn{display:none}
 .shotstats{display:flex;flex-direction:column;gap:4px;margin-top:2px;background:rgba(12,36,24,.9);border:1px solid rgba(243,246,238,.12);border-radius:6px;padding:8px 12px}
 .shotstats div{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
@@ -365,19 +377,18 @@ body.touch #lockBtn{display:block}
   <div id="report" hidden><div class="rp-tot"><span class="lab" id="rpLab">Swing</span><b id="rpTot">0</b></div><div class="rp-cells" id="rpCells"></div></div>
   <div class="shotrow" id="shotRow" hidden></div>
   <div class="dockrow">
-    <div class="club">
-      <button class="ib" id="cPrev" aria-label="Longer club">‹</button>
-      <div class="cbody"><div id="cName">Driver</div><div id="cDist" class="num">250 yd carry</div></div>
-      <button class="ib" id="cNext" aria-label="Shorter club">›</button>
+    <div class="ctrls">
+      <div class="aimrow"><button class="ab" id="aimL" aria-label="Aim left">‹</button><span class="ablab">Aim</span><button class="ab" id="aimR" aria-label="Aim right">›</button></div>
+      <div class="clubsel"><div class="club2"><canvas id="clubIcon" width="44" height="30" aria-hidden="true"></canvas><div class="cbody"><div id="cName">Driver</div><div id="cDist" class="num">250 yd carry</div></div></div><div class="updn"><button class="ab" id="cPrev" aria-label="Longer club">▲</button><button class="ab" id="cNext" aria-label="Shorter club">▼</button></div></div>
     </div>
     <div class="readout">
       <div><span class="lab" id="rPinLab">To pin</span><b id="rPin" class="num">412 yd</b></div>
       <div><span class="lab">Lie</span><b id="rLie">Tee box</b></div>
       <div id="rBreakWrap" hidden><span class="lab">Break</span><b id="rBreak">Slight</b></div>
     </div>
+    <button id="lockBtn">Swing</button>
   </div>
   <div class="dockhint" id="aimHint"></div>
-  <button id="lockBtn">Set target</button>
 </div>
 <div id="swingUI">
   <div class="meterwrap">
@@ -915,7 +926,6 @@ function setCat(cat){
 }
 function setClub(delta){
  if(state!=='aim')return;
- if(mode==='full'){const cats=CATS.filter(c=>CLUBS.some(k=>k.cat===c));let j=cats.indexOf(CLUBS[ci].cat);setCat(cats[clamp(j+delta,0,cats.length-1)]);return;}
  const idx=clubsFor(mode);let j=idx.indexOf(ci);if(j<0)j=0;
  j=clamp(j+delta,0,idx.length-1);if(idx[j]===ci)return;ci=idx[j];
  plan=planUser?Math.min(plan,maxDist()):defaultPlan();frameShot();updateHUD();sfx.tick();
@@ -975,7 +985,7 @@ function setupShot(){
  frameShot();updateHUD();
  updateHint();
 }
-function lockTarget(){if(state!=='aim'||locked||tut.block)return;locked=true;sw.osc=-Math.PI/2*(Math.random()<.5?1:-1);sfx.lock();updateHint();tutEvent('ph0');}
+function lockTarget(){if(state!=='aim'||locked||tut.block)return;locked=true;sw.osc=-Math.PI/2*(Math.random()<.5?1:-1);sfx.lock();if(game()==='full')swingAction();updateHint();tutEvent('ph0');}
 function unlockTarget(){if(state==='aim'&&locked&&!tut.on){locked=false;updateHint();}}
 
 /* ---------- the three shot games ---------- */
@@ -993,6 +1003,12 @@ function uiSync(){
 }
 // trail colors by score tier: lvl 1 glows, lvl 2 and up glow wide and sparkle
 function trailCol(v){v=v||1;return v>=100?{rgb:'255,211,77',lvl:3}:v>=95?{rgb:'180,108,255',lvl:2}:v>=85?{rgb:'92,188,255',lvl:1}:v>=70?{rgb:'102,221,147',lvl:0}:v>=50?{rgb:'255,171,82',lvl:0}:{rgb:'255,109,97',lvl:0};}
+function drawClubIcon(c){
+ const cvs=$('clubIcon');if(!cvs)return;const x=cvs.getContext('2d');x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,44,30);
+ const hd=c.putter?{k:'putter',n:'PUTTER',loft:3}:c.cat==='wedges'?{k:'iron',loft:c.loft||52,H:9}:c.cat==='long'?(c.id==='woods'?{k:'wood',loft:15}:c.id==='hybrid'?{k:'hybrid',loft:20}:{k:'iron',loft:18,H:7}):{k:'iron',loft:c.loft||34,H:8};
+ x.save();if(hd.k==='wood'){x.translate(4,-2);}else if(hd.k==='hybrid'){x.translate(1,-1);}
+ drawHead(x,hd,hd.k==='putter'?32:28,25,hd.k==='iron'?.12:0);x.restore();
+}
 function grade(v){return v>=90?'g-top':v>=70?'g-ok':'g-bad';}
 function oscPeriod(){
  const g=game();
@@ -2103,11 +2119,9 @@ const DRILL_NAME={full:'Full swing',chip:'Chipping',putt:'Putting'};
 function renderShotRow(){
  const row=$('shotRow');
  const ms=state==='aim'||state==='intro'?modesFor():[mode];
- const show=ms.length>1||mode==='chip'||mode==='full';
+ const show=ms.length>1||mode==='chip';
  let h='';
  if(ms.length>1)h+=`<div class="seg"><span class="sl">Shot</span>${ms.map(m=>`<button data-m="${m}" aria-pressed="${m===mode}">${MODE_NAME[m]}</button>`).join('')}</div>`;
- if(mode==='full'&&state==='aim'){const cats=CATS.filter(c=>CLUBS.some(k=>k.cat===c));h+=`<div class="seg"><span class="sl">Club</span>${cats.map(c=>`<button data-c="${c}" aria-pressed="${CLUBS[ci].cat===c}">${CATN[c]}</button>`).join('')}</div>`;
-}
  if(mode==='chip')h+=`<div class="seg"><span class="sl">Flight</span>${SPIN.map((s,i)=>`<button data-s="${i}" aria-pressed="${i===spinLv}">${s}</button>`).join('')}</div>`;
  if(row.dataset.h!==h){row.innerHTML=h;row.dataset.h=h;}
  if(row.hidden===show){row.hidden=!show;measureVR();}
@@ -2134,9 +2148,9 @@ function updateHUD(){
  $('windTxt').textContent=`${hole.wind.mph} mph`;
  $('windArrow').style.transform=`rotate(${(hole.wind.a+cam.rot)*180/Math.PI}deg)`;
  const c=CLUBS[ci];
- $('cName').textContent=mode==='full'?CATN[c.cat]:c.n;
+ $('cName').textContent=c.n;drawClubIcon(c);
  const md=Math.round(maxDist());
- $('cDist').textContent=mode==='putt'?`${Math.round(putterRange()*3)} ft range`:mode==='chip'?`Chip to ${md} yd · ${c.loft}°`:mode==='bump'?`Bump to ${md} yd`:`${c.n} · ${md} yd`;
+ $('cDist').textContent=mode==='putt'?`${Math.round(putterRange()*3)} ft range`:mode==='chip'?`Chip to ${md} yd · ${c.loft}°`:mode==='bump'?`Bump to ${md} yd`:`${md} yd carry`;
  const D=distPin();
  const onG=lie==='green'||lie==='fringe';
  $('rPin').textContent=D<15?fmtFt(D):`${Math.round(D)} yd`;
@@ -2156,7 +2170,7 @@ const BTN={full:['Top','Go','Square','Strike'],chip:['Hands','Length','Strike'],
 function updateHint(){
  const T=isTouch?1:0;const h=$('hint');const g=game();
  const si=state==='aim'?0:state==='swing'?ph:-1;
- $('aimHint').textContent=state==='aim'&&!locked?(T?'Drag to where you want to land, then tap Set target':'Point at where you want to land · click to lock it in'):'';
+ $('aimHint').textContent=state==='aim'&&!locked?(T?'Aim with ‹ › · club with ▲ ▼ · drag to look around':'← → aim · ↑ ↓ club · drag or scroll to look around · Space or Swing to hit'):'';
  if(g==='full'&&state==='aim')h.textContent=T?'Tap Swing to start the backswing':'Click or press Space to start the swing · Esc to move the target';
  else if(si>=0)h.textContent=HINTS[g][si][T];
  else if(state==='anim')h.textContent=T?'Tap to skip':'Click to skip';
@@ -2402,15 +2416,15 @@ function trainResult(kind){
 /* ---------- tutorial ---------- */
 const TUTS={
  full:[
-  {on:'now',t:'Full swing',b:'First point at where you want to land and click to lock the target. Then four parts make the swing: Backswing, Tempo, Face and Low point, each scored from 1 to 100. Everything runs at half speed in this tutorial.'},
-  {on:'ph0',t:'1 · Backswing',b:'Target locked, press Esc to move it again. Click to start the swing and stop the needle on the dashed PLAN line to fly your planned distance. Past the white FULL line is overswing.'},
+  {on:'now',t:'Full swing',b:'Aim with ← → or the Aim buttons, pick a club with ↑ ↓, drag or scroll to look around, then press Swing. Four parts make the swing: Backswing, Tempo, Face and Low point, each scored from 1 to 100. Everything runs at half speed in this tutorial.'},
+  {on:'ph0',t:'1 · Backswing',b:'The needle runs right. Stop it on the dashed PLAN line to fly your planned distance. Past the white FULL line is overswing.'},
   {on:'ph1',t:'2 · Tempo',b:'Pause at the top and click when the bar reaches the yellow window. Rushed or lazy costs distance, and a rushed transition makes the face turn faster in the next step.'},
   {on:'ph2',t:'3 · Face',b:'The face turns from open to closed as you swing down, and that shapes the shot. Yellow is straight. The blue bands curve it on purpose: a little closed draws left, a little open fades right. Red is a hook or a slice. Blades have a thin yellow band and wide blue ones, game improvement irons the other way around.'},
   {on:'ph3',t:'4 · Low point',b:'Where the club bottoms out. Click in the yellow zone. A bit to the right is thin, all the way right tops it along the ground. A bit to the left is fat, all the way left is a chunk that barely goes anywhere.'},
   {on:'result',t:'Your swing report',b:'Every shot shows a score per part. Forgiving clubs like hybrids and the 5 wood give wider windows, set them up in myNolan. From now on the ball comes back to this spot after every shot.',last:true}
  ],
  chip:[
-  {on:'now',t:'Chipping',b:'Around the green you choose the shot. A Chip uses a wedge and you pick the ball flight. A Bump and run uses an iron, flies low and rolls out, and plays with the easier full swing. Chipping is harder than a full swing, just like in real golf. Point at your landing spot and click to lock it.'},
+  {on:'now',t:'Chipping',b:'Around the green you choose the shot. A Chip uses a wedge and you pick the ball flight. A Bump and run uses an iron, flies low and rolls out, and plays with the easier full swing. Chipping is harder than a full swing, just like in real golf. Aim with the arrows, pick a wedge with ↑ ↓ and press Swing.'},
   {on:'now',t:'Flight',b:'Pick a Low, Mid or High ball flight. Low is the easiest to hit and runs out the most. High lands soft and stops fast, but its windows are the smallest. The dotted line shows where the ball should finish.'},
   {on:'ph0',t:'1 · Hands',b:'Landing spot locked. Now click when the shaft leans into the yellow, hands just ahead of the ball. Scooping adds height and kills spin, pressing too hard makes the club dig and the ball come out low.'},
   {on:'ph1',t:'2 · Length',b:'Good wedge players use the clock system: 7:30, 9:00, 10:30. The needle speeds up as it goes back, so stop it a touch early on the dashed line.'},
@@ -2418,7 +2432,7 @@ const TUTS={
   {on:'result',t:'Nicely done',b:'Check the report for hands, length and contact. Try the Bump and run too, it is the safer play when there is lots of green. The ball comes back here after every shot.',last:true}
  ],
  putt:[
-  {on:'now',t:'Putting',b:'Putting has its own stroke with three parts. First read the green: the white streaks drift downhill, and the ball breaks the same way. Aim a little above the hole on the high side, then click to lock your line.'},
+  {on:'now',t:'Putting',b:'Putting has its own stroke with three parts. First read the green: the white streaks drift downhill, and the ball breaks the same way. Aim a little above the hole on the high side with ← →, then press Swing.'},
   {on:'ph0',t:'1 · Face',b:'Line locked. The putter face rocks open and closed between the two gate tees. Click when it is square, the face turns yellow.'},
   {on:'ph1',t:'2 · Length',b:'Take the putter back and stop it on the dashed line. The line is set by how far you point, so point past the hole for an uphill putt.'},
   {on:'ph2',t:'3 · Strike',b:'Click as the putter reaches the ball. Early is a jab that runs long, late is a deceleration that dies short.'},
@@ -2454,28 +2468,28 @@ function setAimFromScreen(px,py){
  const L=landingPoint(true);const sp=w2s(L.x,L.y);
  if(!viewAll&&(sp[0]<30||sp[0]>W-30||sp[1]<VR.y+20||sp[1]>VR.y+VR.h-20))frameShot();
 }
-let touchAiming=false;
+let pan=null,holdL=0,holdR=0;
+function panBy(dx,dy){const c=Math.cos(cam.rot),sn=Math.sin(cam.rot);const wx=(dx*c+dy*sn)/cam.s,wy=(-dx*sn+dy*c)/cam.s;cam.x-=wx;cam.y-=wy;cam.tx-=wx;cam.ty-=wy;}
 cv.addEventListener('pointerdown',e=>{
  audio();
  if(e.pointerType==='touch'){if(!isTouch){isTouch=true;document.body.classList.add('touch');updateHint();}}
  else if(e.pointerType==='mouse'&&isTouch&&!matchMedia('(pointer:coarse)').matches){isTouch=false;document.body.classList.remove('touch');updateHint();}
  if(state==='menu'||state==='done')return;
- if(e.pointerType==='touch'||e.pointerType==='pen'){
-  if(state==='aim'&&!locked&&!tut.block){touchAiming=true;cv.setPointerCapture(e.pointerId);setAimFromScreen(e.clientX,e.clientY);}
-  else swingAction();
- }else if(e.button===0){
-  if(state==='aim'&&!locked&&!tut.block)setAimFromScreen(e.clientX,e.clientY);
-  swingAction();
- }else if(e.button===2)unlockTarget();
+ if(e.button===2){unlockTarget();return;}
+ // while aiming the map is yours to drag; during the swing a tap is a swing click
+ if((state==='aim'&&!locked)||state==='settle'||state==='flight'){if(!tut.block){pan={id:e.pointerId,x:e.clientX,y:e.clientY};cv.setPointerCapture(e.pointerId);cv.style.cursor='grabbing';}else swingAction();return;}
+ swingAction();
 });
-cv.addEventListener('pointermove',e=>{
- if(state!=='aim'||locked)return;
- if(e.pointerType==='mouse'||touchAiming)setAimFromScreen(e.clientX,e.clientY);
-});
-cv.addEventListener('pointerup',()=>{touchAiming=false;});
-cv.addEventListener('pointercancel',()=>{touchAiming=false;});
-let wheelT=0;
-cv.addEventListener('wheel',e=>{e.preventDefault();const n=performance.now();if(n-wheelT<120)return;wheelT=n;setClub(e.deltaY>0?1:-1);},{passive:false});
+cv.addEventListener('pointermove',e=>{if(!pan||e.pointerId!==pan.id)return;panBy(e.clientX-pan.x,e.clientY-pan.y);pan.x=e.clientX;pan.y=e.clientY;});
+const endPan=()=>{pan=null;cv.style.cursor='';};
+cv.addEventListener('pointerup',endPan);
+cv.addEventListener('pointercancel',endPan);
+cv.addEventListener('wheel',e=>{e.preventDefault();if(e.ctrlKey){const z=Math.exp(-e.deltaY*.01);cam.s=cam.ts=clamp(cam.s*z,.6,60);return;}panBy(-e.deltaX,-e.deltaY);},{passive:false});
+// aim buttons: tap for a small step, hold to keep turning
+function holdBtn(id,set){const b=$(id);const on=e=>{e.preventDefault();audio();set(1);aim+=0;};const off=()=>set(0);b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointerleave',off);b.addEventListener('pointercancel',off);}
+holdBtn('aimL',v=>{holdL=v?.6:0;if(v&&state==='aim'&&!locked){aim-=.004;frameIfOff();}});
+holdBtn('aimR',v=>{holdR=v?.6:0;if(v&&state==='aim'&&!locked){aim+=.004;frameIfOff();}});
+function frameIfOff(){if(viewAll)return;const L=landingPoint();const sp=w2s(L.x,L.y);if(sp[0]<30||sp[0]>W-30||sp[1]<VR.y+20||sp[1]>VR.y+VR.h-20)frameShot();}
 $('swing').addEventListener('pointerdown',e=>{e.preventDefault();audio();swingAction();});
 $('lockBtn').addEventListener('pointerdown',e=>{e.preventDefault();audio();lockTarget();});
 cv.addEventListener('contextmenu',e=>e.preventDefault());
@@ -2491,7 +2505,6 @@ function setMute(m){muted=m;DB.muted=m;save();$('bSound').setAttribute('aria-pre
 $('bSound').onclick=()=>{audio();setMute(!muted);};
 setMute(muted);
 $('intro').addEventListener('click',endIntro);
-let holdL=0,holdR=0;
 addEventListener('keydown',e=>{
  if(state==='menu'||state==='done'||!$('cardOv').hidden){if(e.key==='Escape'&&!$('cardOv').hidden&&state!=='done'&&state!=='menu'&&G&&!(G.scores[G.idx]&&state==='holed'))$('cardOv').hidden=true;return;}
  const k=e.key;
@@ -2514,7 +2527,7 @@ addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='a')holdL=0;if(e.ke
 let lastT=performance.now();
 function loop(now){
  const dt=Math.min(.05,(now-lastT)/1000);lastT=now;
- if(state==='aim'&&(holdL||holdR)){
+ if(state==='aim'&&!locked&&(holdL||holdR)){
   aim+=(mode==='putt'?.25:.5)*(holdR-holdL)*dt;
   if(!viewAll){const L=landingPoint();const sp=w2s(L.x,L.y);if(sp[0]<30||sp[0]>W-30||sp[1]<VR.y+20||sp[1]>VR.y+VR.h-20)frameShot();}
  }
